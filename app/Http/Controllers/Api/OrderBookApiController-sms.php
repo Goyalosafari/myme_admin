@@ -1,0 +1,378 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+use App\Models\Notification;
+use App\Models\User;
+use App\Models\Order;
+use App\Models\OrderBook;
+use App\Models\Wallet;
+use App\Models\TimeSlot;
+use App\Http\Controllers\Controller;
+use App\Services\SmsService;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+
+class OrderBookApiController extends Controller
+{
+    protected $smsService;
+
+    public function __construct(SmsService $smsService)
+    {
+        $this->smsService = $smsService;
+    }
+    
+    public function smstest(Request $request)
+    {
+        
+    }
+    
+    public function createOrderBook(Request $request)
+    {
+        $requestData = $request->all();
+
+        if(!is_array($requestData))
+        {
+            return response(['error'=> 'Invalid request data'],400);
+        }
+
+        //$userData = User::find(Auth::id());       
+        
+        // Set common values in $requestData
+        //$requestData['user_id'] = Auth::id();
+        $requestData['user_id'] = $requestData['user_id'];
+        //$requestData['customer'] = $userData->name;
+        $requestData['customer'] = $requestData['user_id'];
+        $requestData['user'] = $requestData['active_address'];    ///address
+        $requestData['pack_user'] = $requestData['address_type'];   //preference
+        $requestData['invoice_dt'] = now()->format('Y-m-d');
+        $requestData['finyear'] = $requestData['finyear'] ?? "2023-24";
+        $requestData['status'] = 'order';
+        //calculate invoice number
+        $requestData['invoice'] = OrderBook::max('invoice') + 1 ?? 100;
+
+        //calculate order sum
+       // $orderSum  = Order::where('user_id',Auth::id())
+        $orderSum  = Order::where('user_id',$request->user_id)
+        ->where('status', 'cart')->sum('total');
+        $requestData['value'] = (float) $orderSum;
+        $requestData['wallet'] = (float) $requestData['wallet'];
+        $requestData['charge'] = (float) $requestData['charge'];
+        $requestData['coupon'] = (float) $requestData['coupon'];
+        $requestData['payment_amount'] = $orderSum + $requestData['charge'] - $requestData['coupon'];
+        
+        $timeslotData = TimeSlot::find($requestData['time_slot_id']);
+        $requestData['del_dt'] = $requestData['date'];
+        $requestData['ref'] = $requestData['time_slot_id'];
+        $requestData['ref1'] = $timeslotData->time_slot;
+
+        
+
+        //validate the incoming request data
+        $validator = Validator::make($requestData, [
+            'invoice_dt' => 'nullable|date',
+            'charge' => 'required',
+            'coupon' => 'required',
+            'wallet' => 'required',
+            'user' => 'nullable|string',
+            'finyear' => 'string',
+            'payment_status' => 'required',
+            'payment_mode' => 'required',
+            'payment_ref' => 'nullable|string',
+            'del_dt' => 'required',
+            'ref' => 'required',
+            'ref1' => 'required',
+            'user' => 'nullable|string',
+            'pack_user' => 'nullable|string',
+        ]);
+        
+    $orderBook = OrderBook::create($requestData);
+        
+        $updateOrder = Order::where('user_id', $requestData['user_id'])
+        ->where('status','cart')
+        ->update([
+            'status'=>'order',
+            'order_book_id' => $orderBook->id,
+            'order_id' => $orderBook->id,
+            'time_slot_id' => $requestData['time_slot_id'],
+            'date' => $requestData['date']
+        ]);
+        
+        
+        $debitSum = Wallet::where('user_id', $requestData['user_id'])
+        ->sum('debit');
+        $creditSum = Wallet::where('user_id', $requestData['user_id'])
+        ->sum('credit');
+        $walletSum = $debitSum- $creditSum;
+
+        $creditAmount = min($requestData['payment_amount'], $walletSum);
+            
+        $wallet = Wallet::create([
+            'user_id' => $requestData['user_id'],
+            'credit' => $creditAmount,
+            'date' => Carbon::today(),
+            'description' => $request->description
+        ]);
+
+        //add wallet amount to wallets table
+       /* $wallet = Wallet::create([
+            'user_id' =>  $requestData['user_id'],
+            'credit' => $requestData['wallet'],
+            'date' => Carbon::today(),
+            'description' => $request->description
+        ]);*/
+        $orderBookData = OrderBook::find($orderBook->id);
+
+        $ordersList = Order::where('order_book_id', $orderBook->id)->get();
+        foreach($ordersList as $list){
+            $order_id = $list->id;
+            Notification::where('order_id', $order_id)
+            ->update([
+                'food_id' => $list->food_id,
+                'message' => 'Product Ordered',
+                'general' => 'no',
+                'status' => 'yes'
+            ]);
+        }
+            
+      
+      /* jan 4 update
+      
+        $orderBook = OrderBook::create($requestData);
+        
+        ///$request->user_id
+        // $updateOrder = Order::where('user_id',Auth::id())
+        
+        $updateOrder = Order::where('user_id',$request->user_id)
+        ->where('status','cart')
+        ->update([
+            'status'=>'order',
+            'order_book_id' => $orderBook->id,
+            'order_id' => $orderBook->id
+        ]);
+
+        $orderBookData = OrderBook::find($orderBook->id);
+        */
+
+        $userData = User::find($requestData['user_id']);   
+        $mobileNumber = $userData->mobile; 
+        $message = "Thank you for your order with MYME BUSINESS CORPORATION PRIVATE LIMITED ! Your order #{$orderBook->id} has been successfully placed. You will receive a confirmation email shortly. Estimated delivery time: {$orderBook->ref1} and date : {$orderBook->del_dt}.";
+        $templateID = '1207171377328523771';
+        try {
+            $response = $this->smsService->sendSms($mobileNumber, $message, $templateID);
+        } catch (\Exception $e) {
+            \Log::error('SMS sending failed: ' . $e->getMessage());
+        }
+
+        return response(['message' => 'Order created successfully', 'oderBook'=>$orderBookData],201);
+    }
+    
+    /*
+    public function createOrderBook(Request $request)
+    {
+        $requestData = $request->all();
+
+        if(!is_array($requestData))
+        {
+            return response(['error'=> 'Invalid request data'],400);
+        }
+
+      //  $userData = User::find(Auth::id());       
+        
+        // Set common values in $requestData
+        //$requestData['user_id'] = Auth::id();
+        $requestData['user_id'] = $requestData['user_id'];
+        //$requestData['customer'] = $userData->name;
+        $requestData['customer'] = $requestData['user_id'];
+        $requestData['invoice_dt'] = now()->format('Y-m-d');
+        $requestData['finyear'] = $requestData['finyear'] ?? "2023-24";
+        $requestData['status'] = 'order';
+        //calculate invoice number
+        $requestData['invoice'] = OrderBook::max('invoice') + 1 ?? 100;
+
+        //calculate order sum
+       // $orderSum  = Order::where('user_id',Auth::id())
+        $orderSum  = Order::where('user_id',$request->user_id)
+        ->where('status', 'cart')->sum('total');
+        $requestData['value'] = (float) $orderSum;
+
+        $requestData['charge'] = (float) $requestData['charge'];
+        $requestData['coupon'] = (float) $requestData['coupon'];
+        $requestData['payment_amount'] = $orderSum + $requestData['charge'] - $requestData['coupon'];
+
+        //validate the incoming request data
+        $validator = Validator::make($requestData, [
+            'invoice_dt' => 'nullable|date',
+            'charge' => 'required|numeric',
+            'coupon' => 'nullable|numeric',
+            'user' => 'nullable|string',
+            'finyear' => 'string',
+            'payment_status' => 'required',
+            'payment_mode' => 'required',
+            'payment_ref' => 'nullable|string',
+        ]);
+            
+        $orderBook = OrderBook::create($requestData);
+        
+        foreach($request->orders as $order)
+        {
+            $updateOrder = Order::where('id',$order)->update([
+                'status'=>'order',
+                'order_book_id' => $orderBook->id,
+                'order_id' => $request->order_id
+            ]);
+        }
+
+        $orderBookData = OrderBook::find($orderBook->id);
+
+        return response(['message' => 'Order created successfully', 'oderBook'=>$orderBookData], 201);
+    }*/
+
+    public function orderBookList(Request $request)
+    {
+        $orders = OrderBook::with('orders')
+        ->where('user_id', $request->user_id)
+        ->where('order_id',$request->order_id)
+        ->where('status', 'order')
+        ->get();
+        return response()->json($orders, 200);
+    }
+    
+    
+    
+        public function cancelOrder(Request $request)
+    {
+        $date = Carbon::now();
+        $orderBookData = OrderBook::find($request->order_book_id);
+        $timeslotData = TimeSlot::find($orderBookData->ref);
+
+        if($orderBookData->del_dt < $date->format('Y-m-d') ||
+        ($orderBookData->del_dt == $date->format('Y-m-d') && $date->format('H') > $timeslotData->ref1))
+        {
+            $status = 'you can not cancel this order';
+        }
+        else
+        {
+            $walletAmtByOrderBook = Wallet::find($orderBookData->wallet_id);
+            $orderSum = $orderBookData['payment_amount'] + $walletAmtByOrderBook;
+            $wallet = Wallet::create([
+                'user_id' =>  $request->user_id,
+                'debit' => $orderSum,
+                'date' => Carbon::today(),
+                'description' => $request->description
+            ]);
+
+            $updateOrderBook = OrderBook::where('id', $request->order_book_id)
+            ->update(['status' => 'cancel']);
+
+            $ordersList = Order::where('order_book_id', $request->order_book_id)->get();
+            foreach($ordersList as $list){
+                $order_id = $list->id;
+                Order::where('id',$order_id)
+                ->update(['status' => 'cancel']);
+                Notification::create([
+                    'food_id' => $list->food_id,
+                    'order_id' =>$order_id,
+                    'message' => 'Product Cancelled',
+                    'general' => 'no',
+                    'status' => 'yes'
+                ]);
+            }
+            $status = 'success';
+            
+            $userData = User::find($request->user_id);   
+            $mobileNumber = $userData->mobile; 
+            $templateID = '1207171377044163620';
+            $message = "Dear {$userData->name},
+    
+            We've successfully cancelled your order #{$request->order_book_id}. The amount for the cancelled items has been added to your wallet balance. You can use this balance for your future purchases.
+    
+            If you have any questions or need further assistance, please feel free to contact us.
+    
+            Thank you for your understanding.
+    
+            Best regards,
+            MYME BUSINESS CORPORATION PRIVATE LIMITED";
+            try {
+                $response = $this->smsService->sendSms($mobileNumber, $message, $templateID);
+            } catch (\Exception $e) {
+                \Log::error('SMS sending failed: ' . $e->getMessage());
+            }
+        }
+
+        return response()->json(['status' => $status ]);
+    }
+    
+    
+   /* 
+    public function cancelOrder(Request $request)
+    {
+             $wallet = Wallet::create([
+            'user_id' =>  $request->user_id,
+            'debit' => $request->debit,
+            'date' => Carbon::today(),
+            'description' => $request->description
+        ]);
+        $updateOrderBook = OrderBook::where('id', $request->order_book_id)
+        ->update(['status' => 'cancel']);
+
+        $ordersList = Order::where('order_book_id', $request->order_book_id)->get();
+        foreach($ordersList as $list){
+            $order_id = $list->id;
+            Order::where('id',$order_id)
+            ->update(['status' => 'cancel']);
+            Notification::create([
+                'food_id' => $list->food_id,
+                'order_id' =>$order_id,
+                'message' => 'Product Cancelled',
+                'general' => 'no',
+                'status' => 'yes'
+            ]);
+        }
+        return response()->json(['status' => 'success']);
+    }*/
+    
+    public function ordersHistory(Request $request)
+   {
+         $orders = OrderBook::where('user_id', $request->user_id)
+        ->where('status','order')->orderBy('id', 'desc')->get();
+        return response()->json(['orders' => $orders], 200);
+    }
+    
+        public function userWallet(Request $request)
+   {
+       
+        $debitSum = Wallet::where('user_id', $request->user_id)
+        ->sum('debit');
+        $creditSum = Wallet::where('user_id', $request->user_id)
+        ->sum('credit');
+        $walletSum = $debitSum- $creditSum;
+
+            return response()->json(['sum' => $walletSum], 200);
+            
+   } 
+       
+     /* $wallets = Wallet::where('user_id', $request->user_id)->get();
+
+            $total = 0;
+            foreach ($wallets as $wallet) {
+            $total += $wallet->debit - $wallet->credit;
+            }
+
+            return response()->json(['sum' => $total], 200);*/
+            
+    
+  /*  public function cancelOrder(Request $request)
+    {
+        $wallet = Wallet::create([
+            'user_id' => $request->user_id,
+            'debit' => $request->debit,
+            'date' => Carbon::today(),
+            'description' => $request->description
+        ]);
+        $updateOrderBook = OrderBook::where('id', $request->order_book_id)
+        ->update(['status', 'cancel']);
+        return response()->json(['status' => 'success']);
+    }*/
+}
