@@ -100,6 +100,7 @@ Route::middleware(['auth:admin', 'web', 'prevent-back-history'])->group(function
     Route::delete('/coupen/delete/{id}',[CoupenController::class, 'destroy'])->name('coupen.destroy');
 
     Route::get('/timeslot', [TimeslotController::class, 'index'])->name('timeslot.index');
+    Route::post('/timeslot/toggle-status/{id}', [TimeslotController::class, 'toggleStatus'])->name('timeslot.toggle');
     Route::post('/timeslot/post',[TimeslotController::class, 'store'])->name('timeslot.store');
     Route::get('/timeslot/{id}/edit',[TimeslotController::class, 'edit']);
     Route::put('/timeslot/update/{id}',[TimeslotController::class,'update'])->name('timeslot.update');

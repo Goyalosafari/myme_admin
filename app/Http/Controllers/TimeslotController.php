@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\TimeSlot;
 use Illuminate\Http\Request;
 
@@ -16,8 +17,9 @@ class TimeslotController extends Controller
     public function index()
     {
         $datas = $this->time_slot->all();
-        return view('time_slot',compact('datas'));
+        return view('time_slot', compact('datas'));
     }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -36,13 +38,12 @@ class TimeslotController extends Controller
         $data->status = 'y';
         $data->save();
 
-        return redirect('/timeslot')->with('success','Timeslot created successfully');
+        return redirect('/timeslot')->with('success', 'Timeslot created successfully');
     }
 
     public function edit($id)
     {
         $time_slot = $this->time_slot->find($id);
-        
         return response()->json($time_slot);
     }
 
@@ -63,12 +64,24 @@ class TimeslotController extends Controller
         $data->ref1 = $request->input('ref1');
         $data->save();
 
-        return redirect('/timeslot')->with('success','Timeslot updated successfully');
+        return redirect('/timeslot')->with('success', 'Timeslot updated successfully');
     }
+
     public function destroy($id)
     {
         $time_slot = $this->time_slot->find($id);
         $time_slot->delete();
-        return redirect('/timeslot')->with('success','Timeslot Deleted successfully');
+        return redirect('/timeslot')->with('success', 'Timeslot Deleted successfully');
+    }
+
+    public function toggleStatus(Request $request, $id)
+    {
+        $timeSlot = $this->time_slot->find($id);
+        if ($timeSlot) {
+            $timeSlot->status = $request->input('status');
+            $timeSlot->save();
+            return response()->json(['status' => $timeSlot->status]);
+        }
+        return response()->json(['error' => 'Time slot not found'], 404);
     }
 }
