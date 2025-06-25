@@ -21,7 +21,15 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'mobile','address1','address2','pincode1','pincode2','landmark1','landmark2','active_addr','status'
+        'mobile',
+        'address1',
+        'address2',
+        'pincode1',
+        'pincode2',
+        'landmark1',
+        'landmark2',
+        'active_addr',
+        'status'
     ];
 
     /**
@@ -42,4 +50,9 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
 }
