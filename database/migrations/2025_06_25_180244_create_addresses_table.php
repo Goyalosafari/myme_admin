@@ -14,6 +14,9 @@ class CreateAddressesTable extends Migration
             $table->string('address', 255);
             $table->string('pincode', 10)->nullable();
             $table->string('landmark', 255)->nullable();
+            $table->string('name', 255);
+            $table->string('instruction', 255)->nullable();
+            $table->string('phone', 15)->nullable();
             $table->boolean('status')->default(1);
             $table->string('type', 50)->default('home');
             $table->timestamps();

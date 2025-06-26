@@ -129,6 +129,7 @@ Route::post('/addToCart', [OrderApiController::class, 'addToCart']);
     
       Route::get('/Userprofile', [UserApiController::class,'userInfo']);
     Route::post('/update-profile', [UserApiController::class,'update']);
+    Route::post('/send-otp', [RegisterApiController::class, 'sendOtp']);
     
     Route::get('/pincode', [PincodeApiController ::class, 'index']);
 Route::post('/pincodeValidation', [PincodeApiController ::class, 'pincodeValidation']);
