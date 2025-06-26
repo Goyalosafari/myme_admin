@@ -35,7 +35,7 @@ use Illuminate\Support\Facades\Route;
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
-Route::post('/test-sms', [OrderBookApiController::class, 'smstest']);
+// Route::post('/test-sms', [OrderBookApiController::class, 'smstest']);
 Route::post('/order-sms', [OrderBookApiController::class, 'smsorder']);
 Route::post('/cancel-sms', [OrderBookApiController::class, 'smscancel']);
 ///Route::post('/send-otp', [OrderBookApiController::class, 'sendOtp']);
@@ -119,19 +119,25 @@ Route::post('/addToCart', [OrderApiController::class, 'addToCart']);
     
     Route::post('/createOrderBook', [OrderBookApiController::class, 'createOrderBook']);
 
-	Route::post('/test-sms', [OrderBookApiController::class, 'testSmsSending']); //smstest
+	// Route::post('/test-sms', [OrderBookApiController::class, 'testSmsSending']); //smstest
+    Route::post('/check-user-by-mobile', [RegisterApiController::class, 'checkUserByMobile']);
+
 
     
     Route::post('/cancelOrder', [OrderBookApiController::class, 'cancelOrder']);
         
     Route::get('/cartSumByUserId', [OrderApiController::class, 'cartSumByUserId']);
     Route::get('/gstSumByUserId', [OrderApiController::class, 'gstSumByUserId']);
-    
-      Route::get('/Userprofile', [UserApiController::class,'userInfo']);
-    Route::post('/update-profile', [UserApiController::class,'update']);
+
+    Route::get('/Userprofile', [UserApiController::class, 'userInfo']);
+    Route::post('/update-profile', [UserApiController::class, 'update']);
     Route::post('/send-otp', [RegisterApiController::class, 'sendOtp']);
-    
-    Route::get('/pincode', [PincodeApiController ::class, 'index']);
+    Route::post('/send-login-otp', [RegisterApiController::class, 'sendLoginOtp']);
+
+    Route::delete('/users/address', [UserApiController::class, 'deleteAddress']);
+
+
+Route::get('/pincode', [PincodeApiController ::class, 'index']);
 Route::post('/pincodeValidation', [PincodeApiController ::class, 'pincodeValidation']);
 
 Route::get('/notifications', [NotificationApiController::class, 'index']);

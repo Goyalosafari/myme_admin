@@ -19,6 +19,8 @@ class CreateAddressesTable extends Migration
             $table->string('phone', 15)->nullable();
             $table->boolean('status')->default(1);
             $table->string('type', 50)->default('home');
+            $table->decimal('latitude', 10, 7)->nullable();  
+            $table->decimal('longitude', 10, 7)->nullable(); 
             $table->timestamps();
         });
     }

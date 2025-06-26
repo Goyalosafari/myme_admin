@@ -67,32 +67,79 @@ class RegisterApiController extends Controller
     }
 
     public function sendOtp(Request $request)
-{
-    $request->validate([
-        'email' => 'required|email',
-        'otp' => 'required|string',
-    ]);
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'otp'   => 'required|string',
+        ]);
 
-    // ✅ Check if user with this email already exists
-    if (User::where('email', $request->email)->exists()) {
-        return response()->json([
-            'message' => 'Email already registered. Please login instead.'
-        ], 409); // HTTP 409 Conflict
-    }
+        // ✅ Check if user with this email already exists
+        if (User::where('email', $request->email)->exists()) {
+            return response()->json([
+                'message' => 'Email already registered. Please login instead.',
+            ], 409); // HTTP 409 Conflict
+        }
 
-    // ✅ Render OTP email using Blade template
-    $html = view('email.otp_mail', ['otp' => $request->otp])->render();
+        // ✅ Render OTP email using Blade template
+        $html = view('email.otp_mail', ['otp' => $request->otp])->render();
 
-    // ✅ Send mail
-    Mail::send([], [], function ($message) use ($request, $html) {
-        $message->to($request->email)
+        // ✅ Send mail
+        Mail::send([], [], function ($message) use ($request, $html) {
+            $message->to($request->email)
                 ->subject('Your OTP for Myme App')
                 ->html($html);
-    });
+        });
 
-    return response()->json([
-        'message' => 'OTP sent successfully to ' . $request->email
-    ], 200);
-}
+        return response()->json([
+            'message' => 'OTP sent successfully to ' . $request->email,
+        ], 200);
+    }
+    public function sendLoginOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'otp'   => 'required|string',
+        ]);
+
+        // ✅ Check if user with this email exists
+        if (! User::where('email', $request->email)->exists()) {
+            return response()->json([
+                'message' => 'Email not found. Please register first.',
+            ], 404); // HTTP 404 Not Found
+        }
+
+        // ✅ Render OTP email using Blade template
+        $html = view('email.otp_mail', ['otp' => $request->otp])->render();
+
+        // ✅ Send email
+        Mail::send([], [], function ($message) use ($request, $html) {
+            $message->to($request->email)
+                ->subject('Your Login OTP for Myme App')
+                ->html($html);
+        });
+
+        return response()->json([
+            'message' => 'OTP sent successfully to ' . $request->email,
+        ], 200);
+    }
+
+    public function checkUserByMobile(Request $request)
+    {
+        $request->validate([
+            'mobile' => 'required|string',
+        ]);
+
+        $userExists = User::where('mobile', $request->mobile)->exists();
+
+        if ($userExists) {
+            return response()->json([
+                'message' => 'User with this mobile number exists.',
+            ], 200); // OK
+        }
+
+        return response()->json([
+            'message' => 'User not found with this mobile number.',
+        ], 404); // Not Found
+    }
 
 }

@@ -23,10 +23,8 @@ class OrderBookApiController extends Controller
         $this->smsService = $smsService;
     }
     
-    public function smstest(Request $request)
-    {
-        
-    }
+   
+
     
     public function createOrderBook(Request $request)
     {
