@@ -171,4 +171,4 @@ Route::get('razorpay-payment', [PaymentApiController::class, 'index'])->name('pa
 Route::post('razorpay-payment', [PaymentApiController::class, 'store'])->name('razorpay.payment.store');
 Route::get('/has-rated-food', [OrderApiController::class, 'hasRatedFood']);
 Route::post('/redeem-coins', [OrderBookApiController::class, 'redeemCoins']);
-Route::get('/time-slots', [\App\Http\Controllers\Api\TimeSlotApiController::class, 'index']);
+Route::get('/time-slots', [TimeSlotApiController::class, 'index']);
