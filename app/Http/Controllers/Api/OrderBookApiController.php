@@ -195,6 +195,18 @@ public function smscancel(Request $request)
         $requestData['coupon'] = (float) $requestData['coupon'];
         $requestData['payment_amount'] = $orderSum + $requestData['charge'] - $requestData['coupon'];
 
+        // If use_coin is yes, deduct reward points from payment_amount
+        if (isset($requestData['use_coin']) && $requestData['use_coin'] === 'yes') {
+            $user = User::find($requestData['user_id']);
+            if ($user && $user->reward_points > 0) {
+                // 1 reward point = 1 rupee (adjust if needed)
+                $deduct = min($user->reward_points, $requestData['payment_amount']);
+                $requestData['payment_amount'] -= $deduct;
+                $user->reward_points -= $deduct;
+                $user->save();
+            }
+        }
+
         $timeslotData = TimeSlot::find($requestData['time_slot_id']);
         $requestData['del_dt'] = $requestData['date'];
         $requestData['ref'] = $requestData['time_slot_id'];
@@ -513,4 +525,33 @@ public function sendOtp(Request $request)
         ->update(['status', 'cancel']);
         return response()->json(['status' => 'success']);
     }*/
+    
+    public function redeemCoins(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+        $user = \App\Models\User::find($request->user_id);
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'User not found.'], 404);
+        }
+        $activeConversion = \App\Models\CoinRewardConversion::where('status', 'active')->first();
+        if (!$activeConversion) {
+            return response()->json(['success' => false, 'message' => 'No active coin to reward conversion rate found.'], 400);
+        }
+        $coins = $user->coin;
+        if ($coins <= 0) {
+            return response()->json(['success' => false, 'message' => 'No coins to redeem.'], 400);
+        }
+        $rewardPoints = $coins * $activeConversion->coin_to_reward_rate;
+        $user->reward_points += $rewardPoints;
+        $user->coin = 0;
+        $user->save();
+        return response()->json([
+            'success' => true,
+            'message' => 'Coins redeemed successfully.',
+            'reward_points' => $user->reward_points,
+            'coin' => $user->coin
+        ]);
+    }
 }

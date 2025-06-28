@@ -59,6 +59,12 @@
                         <span> Timeslots </span>
                     </a>        
                 </li>
+                <li class="sidebar-item {{ request()->routeIs('admin.conversion-values.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.conversion-values.index') }}" class='sidebar-link'>
+                        <i data-feather="users" width="20"></i>
+                        <span>Conversion Settings</span>
+                    </a>
+                </li>
                 <li class="sidebar-item {{request()->routeIs('notification.index') ? 'active' : ''}}">
                     <a href="{{route('notification.index')}}" class='sidebar-link'>
                         <i data-feather="bell" width="20"></i> 
@@ -83,6 +89,7 @@
                         <span> Feedback </span>
                     </a>        
                 </li>
+                
             </ul>
         </div>
         <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>

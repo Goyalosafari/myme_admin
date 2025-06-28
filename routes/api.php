@@ -161,3 +161,4 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('razorpay-payment', [PaymentApiController::class, 'index'])->name('payment');
 Route::post('razorpay-payment', [PaymentApiController::class, 'store'])->name('razorpay.payment.store');
 Route::get('/has-rated-food', [OrderApiController::class, 'hasRatedFood']);
+Route::post('/redeem-coins', [OrderBookApiController::class, 'redeemCoins']);

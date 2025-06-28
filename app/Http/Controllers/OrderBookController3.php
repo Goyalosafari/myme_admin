@@ -20,16 +20,16 @@ class OrderBookController extends Controller
         return response()->json(['data'=> $data]);
     }
 
-    public function updateOrderStatus($orderBookId)
-    {
-        OrderBook::where('id', $orderBookId)->update(['status' => 'delivered']);
-        $orders = Order::where('order_book_id', $orderBookId)->get();
-        foreach($orders as $order)
-        {
-            Order::where('id', $order->id)->update(['status'=> 'delivered']);
-        }
-        return 'success';
-    }
+    // public function updateOrderStatus($orderBookId)
+    // {
+    //     OrderBook::where('id', $orderBookId)->update(['status' => 'delivered']);
+    //     $orders = Order::where('order_book_id', $orderBookId)->get();
+    //     foreach($orders as $order)
+    //     {
+    //         Order::where('id', $order->id)->update(['status'=> 'delivered']);
+    //     }
+    //     return 'success';
+    // }
     
     // update status of each item
     // public function updateOrderStatus($orderId)
