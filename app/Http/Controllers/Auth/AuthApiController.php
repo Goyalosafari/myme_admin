@@ -6,6 +6,7 @@ use App\Models\Wallet;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 
 class AuthApiController extends Controller
@@ -47,5 +48,24 @@ class AuthApiController extends Controller
         return $status === Password::RESET_LINK_SENT
             ? response(['message' => __($status)], 200)
             : response(['message' => __($status)], 400);
+    }
+
+    public function forgotPasswordOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'otp' => 'required|string',
+        ]);
+        // Use existing Blade template for OTP with a custom message
+        $html = view('email.otp_mail', [
+            'otp' => $request->otp,
+            'message' => 'You requested to reset your password on Myme App. Please use the following OTP to proceed:'
+        ])->render();
+        Mail::send([], [], function ($message) use ($request, $html) {
+            $message->to($request->email)
+                ->subject('Your OTP for Password Reset - Myme App')
+                ->html($html);
+        });
+        return response(['message' => 'OTP sent successfully to ' . $request->email], 200);
     }
 }

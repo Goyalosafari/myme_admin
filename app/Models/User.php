@@ -29,7 +29,11 @@ class User extends Authenticatable
         'landmark1',
         'landmark2',
         'active_addr',
-        'status'
+        'status',
+        'coin',
+        'reward_points',
+        'referral_code',
+        'referred_by',
     ];
 
     /**

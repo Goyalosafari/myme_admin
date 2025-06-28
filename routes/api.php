@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\TimeslotApiController;
 use App\Http\Controllers\Api\UserApiController;
 use App\Http\Controllers\Auth\AuthApiController;
 use App\Http\Controllers\Auth\RegisterApiController;
+use App\Http\Controllers\Api\UserEditApiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,6 +41,7 @@ Route::post('/deactivate-user', [UserController::class, 'deactivatewebUser']);
 
 Route::post('/login', [AuthApiController::class, 'login']);
 Route::post('/forgot-password', [AuthApiController::class, 'forgot'])->name('password.reset');
+Route::post('/forgot-password-otp', [AuthApiController::class, 'forgotPasswordOtp']);
 Route::post('/logout', [AuthApiController::class, 'destroy']);
 Route::post('/register', [RegisterApiController::class, 'store']);
 
@@ -158,7 +160,15 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::get('/ordersListByUserId', [OrderApiController::class, 'ordersByListUserId']);
     Route::put('/updateTimeslot/{orderId}', [OrderApiController::class, 'updateTimeSlot']);
 });
+// User profile edit APIs
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/user/update-name', [UserEditApiController::class, 'updateName']);
+    Route::post('/user/update-email', [UserEditApiController::class, 'updateEmail']);
+    Route::post('/user/update-password', [UserEditApiController::class, 'updatePassword']);
+});
+Route::post('/user/send-email-otp', [UserEditApiController::class, 'sendEmailOtp']);
 Route::get('razorpay-payment', [PaymentApiController::class, 'index'])->name('payment');
 Route::post('razorpay-payment', [PaymentApiController::class, 'store'])->name('razorpay.payment.store');
 Route::get('/has-rated-food', [OrderApiController::class, 'hasRatedFood']);
 Route::post('/redeem-coins', [OrderBookApiController::class, 'redeemCoins']);
+Route::get('/time-slots', [\App\Http\Controllers\Api\TimeSlotApiController::class, 'index']);

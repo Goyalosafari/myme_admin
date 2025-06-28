@@ -11,7 +11,7 @@
     </div>
     <div><img src="https://firebasestorage.googleapis.com/v0/b/guzty-c2dc5.appspot.com/o/assets%2FGroup%20119.png?alt=media&token=783aeeab-d429-4bd7-9985-6703b84d0e7f" style="margin: 2rem 0 1rem 0;"></div>
     <div style="padding: 0 2rem;">
-      <p>Thank you for registering with Myme App! Please use the following OTP:</p>
+      <p>{{ isset($message) ? $message : 'Thank you for registering with Myme App! Please use the following OTP:' }}</p>
     </div>
     <h2>{{ $otp }}</h2>
     <div style="color: #9e9898; padding: 0 2rem; font-size: 0.7rem;">

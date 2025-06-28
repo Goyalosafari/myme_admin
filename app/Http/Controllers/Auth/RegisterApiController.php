@@ -26,25 +26,60 @@ class RegisterApiController extends Controller
             'addresses.*.phone'       => ['nullable', 'string', 'max:15'],
             'addresses.*.status'      => ['required', 'in:0,1'],
             'addresses.*.type'        => ['required', 'string', 'in:home,work,other'],
+            'referral_code'           => ['nullable', 'string', 'max:255'], // Accept referral code
         ]);
 
         if ($validator->fails()) {
             return response(['error' => $validator->errors()->all()], 422);
         }
 
-        // Create the user with address fields set to null
+        // Referral logic
+        $referrer = null;
+        $referrerReward = 0;
+        $refereeReward = 0;
+        $referredById = null;
+
+        // Get active conversion value for referral
+        $conversion = \App\Models\ConversionValue::where('status', 'active')->latest()->first();
+        if ($conversion) {
+            $referrerReward = $conversion->referrer_reward_points;
+            $refereeReward = $conversion->referee_reward_points;
+        }
+
+        info($refereeReward);
+        // If referral_code is present, try to find the user by referral_code
+        if ($request->filled('referral_code')) {
+            $referrer = \App\Models\User::where('referral_code', $request->referral_code)->first();
+            if ($referrer) {
+                $referredById = $referrer->id;
+                // dd("Referrer found: " . $referrer->name);
+            }
+        }
+
+        // Create the user with address fields set to null and referred_by
         $user = User::create([
-            'name'      => $request->name,
-            'email'     => $request->email,
-            'password'  => Hash::make($request->password),
-            'mobile'    => $request->mobile,
-            'address1'  => null,
-            'address2'  => null,
-            'pincode1'  => null,
-            'pincode2'  => null,
-            'landmark1' => null,
-            'landmark2' => null,
+            'name'        => $request->name,
+            'email'       => $request->email,
+            'password'    => Hash::make($request->password),
+            'mobile'      => $request->mobile,
+            'address1'    => null,
+            'address2'    => null,
+            'pincode1'    => null,
+            'pincode2'    => null,
+            'landmark1'   => null,
+            'landmark2'   => null,
+            'referred_by' => $referredById,
+            'reward_points' => $refereeReward, // Give referee reward points
         ]);
+
+        // Set the new user's referral_code
+        $user->referral_code = 'MYMEREF' . $user->id;
+        $user->save();
+
+        // If referrer exists, update their reward points
+        if ($referrer) {
+            $referrer->increment('reward_points', $referrerReward);
+        }
 
         // Create addresses in the addresses table
         foreach ($request->addresses as $addressData) {
