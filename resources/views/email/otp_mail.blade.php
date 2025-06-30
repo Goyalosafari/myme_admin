@@ -7,7 +7,7 @@
 <body style="background-color: white; font-family: system-ui;">
   <center>
     <div style="background-color: #09992b; padding: 1rem 0;">
-      <img src="https://firebasestorage.googleapis.com/v0/b/guzty-c2dc5.appspot.com/o/assets%2FGroup%20592.png?alt=media&token=9b08bf3d-edfc-43db-8c61-eb0ea563a673" style="width: 3rem;">
+      <img src="{{ asset('images/Group 180.png') }}" style="width: 3rem;">
     </div>
     <div><img src="https://firebasestorage.googleapis.com/v0/b/guzty-c2dc5.appspot.com/o/assets%2FGroup%20119.png?alt=media&token=783aeeab-d429-4bd7-9985-6703b84d0e7f" style="margin: 2rem 0 1rem 0;"></div>
     <div style="padding: 0 2rem;">

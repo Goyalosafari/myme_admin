@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\UserApiController;
 use App\Http\Controllers\Auth\AuthApiController;
 use App\Http\Controllers\Auth\RegisterApiController;
 use App\Http\Controllers\Api\UserEditApiController;
+use App\Http\Controllers\Api\AddressApiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -172,3 +173,4 @@ Route::post('razorpay-payment', [PaymentApiController::class, 'store'])->name('r
 Route::get('/has-rated-food', [OrderApiController::class, 'hasRatedFood']);
 Route::post('/redeem-coins', [OrderBookApiController::class, 'redeemCoins']);
 Route::get('/time-slots', [TimeSlotApiController::class, 'index']);
+Route::middleware('auth:sanctum')->post('/user/add-address', [AddressApiController::class, 'store']);

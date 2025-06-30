@@ -17,15 +17,15 @@ class RegisterApiController extends Controller
             'email'                   => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password'                => ['required', 'string', 'min:8'],
             'mobile'                  => ['nullable', 'string', 'max:255'],
-            'addresses'               => ['required', 'array', 'min:1'],
-            'addresses.*.address'     => ['required', 'string', 'max:255'],
+            'addresses'               => ['nullable', 'array'],
+            'addresses.*.address'     => ['required_with:addresses', 'string', 'max:255'],
             'addresses.*.pincode'     => ['nullable', 'string', 'max:10'],
             'addresses.*.landmark'    => ['nullable', 'string', 'max:255'],
-            'addresses.*.name'        => ['required', 'string', 'max:255'],
+            'addresses.*.name'        => ['required_with:addresses', 'string', 'max:255'],
             'addresses.*.instruction' => ['nullable', 'string', 'max:255'],
             'addresses.*.phone'       => ['nullable', 'string', 'max:15'],
-            'addresses.*.status'      => ['required', 'in:0,1'],
-            'addresses.*.type'        => ['required', 'string', 'in:home,work,other'],
+            'addresses.*.status'      => ['required_with:addresses', 'in:0,1'],
+            'addresses.*.type'        => ['required_with:addresses', 'string', 'in:home,work,other'],
             'referral_code'           => ['nullable', 'string', 'max:255'], // Accept referral code
         ]);
 
@@ -82,17 +82,19 @@ class RegisterApiController extends Controller
         }
 
         // Create addresses in the addresses table
-        foreach ($request->addresses as $addressData) {
-            $user->addresses()->create([
-                'address'     => $addressData['address'],
-                'pincode'     => $addressData['pincode'],
-                'landmark'    => $addressData['landmark'],
-                'name'        => $addressData['name'],
-                'instruction' => $addressData['instruction'],
-                'phone'       => $addressData['phone'],
-                'status'      => $addressData['status'],
-                'type'        => $addressData['type'],
-            ]);
+        if (is_array($request->addresses)) {
+            foreach ($request->addresses as $addressData) {
+                $user->addresses()->create([
+                    'address'     => $addressData['address'],
+                    'pincode'     => $addressData['pincode'],
+                    'landmark'    => $addressData['landmark'],
+                    'name'        => $addressData['name'],
+                    'instruction' => $addressData['instruction'],
+                    'phone'       => $addressData['phone'],
+                    'status'      => $addressData['status'],
+                    'type'        => $addressData['type'],
+                ]);
+            }
         }
 
         // Load the user with addresses for the response
