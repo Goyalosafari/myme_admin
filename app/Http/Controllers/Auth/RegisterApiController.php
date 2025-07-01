@@ -14,9 +14,9 @@ class RegisterApiController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name'                    => ['required', 'string', 'max:255'],
-            'email'                   => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password'                => ['required', 'string', 'min:8'],
-            'mobile'                  => ['nullable', 'string', 'max:255'],
+            'email'                   => ['nullable', 'string', 'email', 'max:255', 'unique:users'],
+            'mobile'                  => ['nullable', 'string', 'max:255', 'unique:users'],
+            'password'                => ['nullable', 'string', 'min:8'],
             'addresses'               => ['nullable', 'array'],
             'addresses.*.address'     => ['required_with:addresses', 'string', 'max:255'],
             'addresses.*.pincode'     => ['nullable', 'string', 'max:10'],
@@ -26,11 +26,23 @@ class RegisterApiController extends Controller
             'addresses.*.phone'       => ['nullable', 'string', 'max:15'],
             'addresses.*.status'      => ['required_with:addresses', 'in:0,1'],
             'addresses.*.type'        => ['required_with:addresses', 'string', 'in:home,work,other'],
-            'referral_code'           => ['nullable', 'string', 'max:255'], // Accept referral code
+            'referral_code'           => ['nullable', 'string', 'max:255'],
         ]);
 
+        // Custom validation: at least one of email or mobile is required
+        $validator->after(function ($validator) use ($request) {
+            if (empty($request->email) && empty($request->mobile)) {
+                $validator->errors()->add('email', 'Either email or mobile is required.');
+                $validator->errors()->add('mobile', 'Either email or mobile is required.');
+            }
+        });
+
         if ($validator->fails()) {
-            return response(['error' => $validator->errors()->all()], 422);
+            $errors = [];
+            foreach ($validator->errors()->messages() as $field => $messages) {
+                $errors[$field] = $messages;
+            }
+            return response(['errors' => $errors], 422);
         }
 
         // Referral logic
