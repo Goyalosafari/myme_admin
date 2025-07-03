@@ -69,4 +69,24 @@ class UserEditApiController extends Controller
         });
         return response(['message' => 'OTP sent successfully to ' . $request->email], 200);
     }
+
+    // Update user mobile number by user_id
+    public function updateMobile(Request $request)
+    {
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required|integer|exists:users,id',
+            'mobile' => 'required|string|max:255|unique:users,mobile',
+        ]);
+        if ($validator->fails()) {
+            $errors = [];
+            foreach ($validator->errors()->messages() as $field => $messages) {
+                $errors[$field] = $messages;
+            }
+            return response(['errors' => $errors], 422);
+        }
+        $user = \App\Models\User::findOrFail($request->user_id);
+        $user->mobile = $request->mobile;
+        $user->save();
+        return response(['message' => 'Mobile number updated successfully', 'user' => $user], 200);
+    }
 }

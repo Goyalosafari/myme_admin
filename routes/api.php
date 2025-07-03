@@ -17,6 +17,7 @@ use App\Http\Controllers\Auth\AuthApiController;
 use App\Http\Controllers\Auth\RegisterApiController;
 use App\Http\Controllers\Api\UserEditApiController;
 use App\Http\Controllers\Api\AddressApiController;
+use App\Http\Controllers\Api\ConversionApiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -166,6 +167,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/user/update-name', [UserEditApiController::class, 'updateName']);
     Route::post('/user/update-email', [UserEditApiController::class, 'updateEmail']);
     Route::post('/user/update-password', [UserEditApiController::class, 'updatePassword']);
+    Route::post('/user/update-mobile', [UserEditApiController::class, 'updateMobile']);
 });
 Route::post('/user/send-email-otp', [UserEditApiController::class, 'sendEmailOtp']);
 Route::get('razorpay-payment', [PaymentApiController::class, 'index'])->name('payment');
@@ -174,3 +176,4 @@ Route::get('/has-rated-food', [OrderApiController::class, 'hasRatedFood']);
 Route::post('/redeem-coins', [OrderBookApiController::class, 'redeemCoins']);
 Route::get('/time-slots', [TimeSlotApiController::class, 'index']);
 Route::middleware('auth:sanctum')->post('/user/add-address', [AddressApiController::class, 'store']);
+Route::middleware('auth:sanctum')->get('/active-conversions', [ConversionApiController::class, 'activeCollections']);

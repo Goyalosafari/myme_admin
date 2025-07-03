@@ -153,7 +153,8 @@ class OrderApiController extends Controller
     {
         $orders = Order::with('food')->where('user_id', $request->user_id)
             ->where('order_book_id', $request->order_id)
-            ->where('status', 'order')->get();
+            // ->where('status', 'order')
+            ->get();
         return response()->json(['orders' => $orders], 200);
     }
 
