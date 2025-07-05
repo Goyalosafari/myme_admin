@@ -166,9 +166,9 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/user/update-name', [UserEditApiController::class, 'updateName']);
     Route::post('/user/update-email', [UserEditApiController::class, 'updateEmail']);
-    Route::post('/user/update-password', [UserEditApiController::class, 'updatePassword']);
     Route::post('/user/update-mobile', [UserEditApiController::class, 'updateMobile']);
 });
+Route::post('/user/update-password', [UserEditApiController::class, 'updatePassword']);
 Route::post('/user/send-email-otp', [UserEditApiController::class, 'sendEmailOtp']);
 Route::get('razorpay-payment', [PaymentApiController::class, 'index'])->name('payment');
 Route::post('razorpay-payment', [PaymentApiController::class, 'store'])->name('razorpay.payment.store');
