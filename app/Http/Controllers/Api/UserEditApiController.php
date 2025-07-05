@@ -41,15 +41,50 @@ class UserEditApiController extends Controller
     // 3. Edit user password
     public function updatePassword(Request $request)
     {
-        $request->validate([
+        // Custom validation logic
+        $validator = Validator::make($request->all(), [
             'password' => 'required|string|min:8|confirmed',
+            'email' => 'nullable|email',
+            'user_id' => 'nullable|numeric',
+            'mobile' => 'nullable|regex:/^\d{10,15}$/',
         ]);
-        $user = Auth::user();
-        $user->password = Hash::make($request->password);
-        $user->save();
-        return response(['message' => 'Password updated successfully'], 200);
-    }
 
+        // Check if validation fails
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation errors',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Retrieve the password from the request
+        $password = $request->input('password');
+
+        // Determine the identifier type and query the user
+        $userQuery = User::query();
+        if ($request->has('email')) {
+            $userQuery->where('email', $request->input('email'));
+        } elseif ($request->has('user_id')) {
+            $userQuery->where('id', $request->input('user_id'));
+        } elseif ($request->has('mobile')) {
+            $userQuery->where('mobile', $request->input('mobile'));
+        } else {
+            return response()->json(['message' => 'No valid identifier provided'], 400);
+        }
+
+        // Find the user
+        $user = $userQuery->first();
+    
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+    
+        // Update the user's password
+        $user->password = Hash::make($password);
+        $user->save();
+    
+        return response()->json(['message' => 'Password updated successfully', 'user' => $user], 200);
+    }
     // 4. Send OTP to new email before editing
     public function sendEmailOtp(Request $request)
     {
