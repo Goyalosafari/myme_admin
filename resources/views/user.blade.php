@@ -47,7 +47,13 @@
                             <td>{{$data->name}}</td>
                             <td>{{$data->email}}</td>
                             <td>{{$data->mobile}}</td>
-                            <td>A1:{{$data->address1}},A2: {{$data->address2}}</td>
+                            <td>
+                                @if($data->addresses && count($data->addresses))
+                                    {{ $data->addresses[0]->address }}, {{ $data->addresses[0]->pincode }}, {{ $data->addresses[0]->landmark }} ({{ $data->addresses[0]->type }})
+                                @else
+                                    <span>No addresses</span>
+                                @endif
+                            </td>
                             <td>P1:{{$data->pincode1}}, P2:{{$data->pincode2}}</td>
                             <td>L1: {{$data->landmark1}}, L2:{{$data->landmark2}}</td>
                         </tr>

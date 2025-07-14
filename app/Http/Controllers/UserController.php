@@ -12,7 +12,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        $userData = User::all();
+        $userData = \App\Models\User::with('addresses')->get();
         return view('user',compact('userData'));
     }
 
