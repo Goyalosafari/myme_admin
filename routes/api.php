@@ -176,4 +176,5 @@ Route::get('/has-rated-food', [OrderApiController::class, 'hasRatedFood']);
 Route::post('/redeem-coins', [OrderBookApiController::class, 'redeemCoins']);
 Route::get('/time-slots', [TimeSlotApiController::class, 'index']);
 Route::middleware('auth:sanctum')->post('/user/add-address', [AddressApiController::class, 'store']);
+Route::middleware('auth:sanctum')->put('/user/address', [App\Http\Controllers\Api\AddressApiController::class, 'updateByBody']);
 Route::middleware('auth:sanctum')->get('/active-conversions', [ConversionApiController::class, 'activeCollections']);
