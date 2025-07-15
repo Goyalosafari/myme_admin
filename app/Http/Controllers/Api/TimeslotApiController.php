@@ -36,9 +36,9 @@ class TimeslotApiController extends Controller
         if($request->date == $date->format('Y-m-d'))
         { 
             $time = $date->format('H');//dd($time);
-            $data = TimeSlot::where('ref1', '>' ,$time)->get();
+            $data = TimeSlot::where('ref1', '>' ,$time)->where('status','y')->get();
         }else{
-            $data = TimeSlot::get();
+            $data = TimeSlot::where('status','y')->get();
         }
         return response()->json($data,200);
        // return response()->json(['data'=>$data]);
