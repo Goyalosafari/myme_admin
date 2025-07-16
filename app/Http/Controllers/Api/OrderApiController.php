@@ -6,6 +6,7 @@ use App\Models\Food;
 use App\Models\FoodRating;
 use App\Models\Notification;
 use App\Models\Order;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -83,6 +84,115 @@ class OrderApiController extends Controller
         return response(['message' => 'Order created successfully', 'order' => $data], 201);
     }
 
+    public function applyRewardPoints(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'user_id'    => 'required|exists:users,id',
+            'use_points' => 'required|boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $userId    = $request->input('user_id');
+        $usePoints = $request->input('use_points');
+        $user      = User::find($userId);
+
+        // Get all items currently in the user's cart
+        $cartItems = Order::where('user_id', $userId)->where('status', 'cart')->get();
+
+        if ($cartItems->isEmpty()) {
+            return response()->json(['message' => 'Your cart is empty.'], 404);
+        }
+
+        DB::beginTransaction();
+        try {
+            // --- First, always revert any existing discount to reset the state ---
+            $pointsToRefund = 0;
+            foreach ($cartItems as $item) {
+                if ($item->reward_discount > 0) {
+                    $pointsToRefund += $item->reward_discount;
+                    $item->total += $item->reward_discount; // Add the discount back to the item total
+                    $item->reward_discount = 0;             // Reset discount
+                    $item->save();
+                }
+            }
+
+            if ($pointsToRefund > 0) {
+                $user->reward_points += $pointsToRefund;
+                // We don't save the user yet, will be saved later in the transaction
+            }
+
+            // --- If the user is turning the toggle OFF, we are done ---
+            if (! $usePoints) {
+                $user->save(); // Save the refunded points
+                DB::commit();
+                return response()->json([
+                    'message'     => 'Reward points have been removed from your cart.',
+                    'cart'        => Order::where('user_id', $userId)->where('status', 'cart')->get(),
+                    'user_points' => $user->reward_points,
+                ]);
+            }
+
+            // --- Logic to APPLY points (now that the cart is in a clean state) ---
+            $totalCartValue = $cartItems->sum(function ($item) {
+                // Calculation is now always on the original price
+                return ($item->price * $item->qty);
+            });
+
+            $pointsToUse = min($user->reward_points, $totalCartValue);
+
+            if ($pointsToUse <= 0) {
+                DB::rollBack(); // Use rollback since we are in a transaction
+                return response()->json(['message' => 'You have no points to apply.'], 400);
+            }
+
+            $user->reward_points -= $pointsToUse;
+            $user->save(); // Save user with deducted points
+
+            $remainingPointsToDistribute = $pointsToUse;
+
+            foreach ($cartItems as $item) {
+                $itemOriginalTotal = $item->price * $item->qty;
+                // Prevent division by zero if cart value is 0
+                $proportion          = $totalCartValue > 0 ? ($itemOriginalTotal / $totalCartValue) : 0;
+                $discountForThisItem = floor($pointsToUse * $proportion);
+
+                // Ensure we don't discount more than the item's value
+                $discountForThisItem = min($discountForThisItem, $itemOriginalTotal);
+
+                $item->reward_discount = $discountForThisItem;
+                $item->total           = $itemOriginalTotal - $discountForThisItem;
+                $item->save();
+
+                $remainingPointsToDistribute -= $discountForThisItem;
+            }
+
+            // Distribute any remaining fraction (due to floor rounding) to the first item
+            if ($remainingPointsToDistribute > 0 && $cartItems->isNotEmpty()) {
+                $firstItem = $cartItems->first();
+                // Ensure we don't discount more than the item's remaining value
+                $additionalDiscount = min($remainingPointsToDistribute, $firstItem->total);
+                $firstItem->reward_discount += $additionalDiscount;
+                $firstItem->total -= $additionalDiscount;
+                $firstItem->save();
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'message'     => 'Reward points applied successfully!',
+                'cart'        => Order::where('user_id', $userId)->where('status', 'cart')->get(),
+                'user_points' => $user->reward_points,
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'An error occurred. Please try again.', 'details' => $e->getMessage()], 500);
+        }
+    }
+
     /*  public function ordersByUserId(Request $request)
     {
         $orders = Order::with('food')->where('user_id', $request->user_id)
@@ -153,7 +263,7 @@ class OrderApiController extends Controller
     {
         $orders = Order::with('food')->where('user_id', $request->user_id)
             ->where('order_book_id', $request->order_id)
-            // ->where('status', 'order')
+        // ->where('status', 'order')
             ->get();
         return response()->json(['orders' => $orders], 200);
     }

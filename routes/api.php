@@ -85,7 +85,7 @@ Route::get('/food/{food}', [FoodApiController::class, 'foodDetails']);
 Route::get('/timeslots', [TimeslotApiController::class, 'index']);
 Route::post('/timeslotsDate', [TimeslotApiController::class, 'getTimeSlotByDate']);
 
-Route::post('/cancelOrder', [OrderBookApiController::class, 'cancelOrder']);
+// Route::post('/cancelOrder', [OrderBookApiController::class, 'cancelOrder']);
 
 Route::post('/orderBookList', [OrderBookApiController::class, 'orderBookList']);
 
@@ -94,6 +94,8 @@ Route::get('/recipeList/{food_id}', [RecipeApiController::class, 'recipeByFood']
 Route::get('/recipe/{recipe}', [RecipeApiController::class, 'recipeDetails']);
 
 Route::post('/addToCart', [OrderApiController::class, 'addToCart']);
+
+Route::post('/apply-reward-points', [OrderApiController::class, 'applyRewardPoints']);
 
 Route::post('/rate_food', [OrderApiController::class, 'AddFoodRating']);
 

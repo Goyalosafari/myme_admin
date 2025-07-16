@@ -161,20 +161,33 @@ public function smscancel(Request $request)
             return response(['error' => 'Invalid request data'], 400);
         }
 
-        // Check if an order book already exists for this user with the same cart sum
-        $existingOrderBook = OrderBook::where('user_id', $requestData['user_id'])
-            ->where('value', function ($query) use ($requestData) {
-                $query->selectRaw('SUM(total)')
-                    ->from('orders')
-                    ->where('user_id', $requestData['user_id'])
-                    ->where('status', 'cart');
-            })
-            ->where('status', 'order')
-            ->first();
+        
+  // --- NEW: Check if the user's cart is empty first ---
+        $cartItems = Order::where('user_id', $requestData['user_id'])
+            ->where('status', 'cart')
+            ->get();
 
-        if ($existingOrderBook) {
-            return response(['message' => 'Order book already exists', 'oderBook' => $existingOrderBook], 200);
+        if ($cartItems->isEmpty()) {
+            return response(['message' => 'Your cart is empty or an order has already been created.'], 400);
         }
+        // --- End of new check ---
+        // Check if an order book already exists for this user with the same cart sum
+        // $existingOrderBook = OrderBook::where('user_id', $requestData['user_id'])
+        //     ->where('value', function ($query) use ($requestData) {
+        //         $query->selectRaw('SUM(total)')
+        //             ->from('orders')
+        //             ->where('user_id', $requestData['user_id'])
+        //             ->where('status', 'cart');
+        //     })
+        //     ->where('status', 'order')
+        //     ->first();
+
+        // if ($existingOrderBook) {
+        //     return response(['message' => 'Order book already exists', 'oderBook' => $existingOrderBook], 200);
+        // }
+
+        // --- Initialize reward amount ---
+        // $requestData['reward_amount'] = 0.00;
 
         // Set common values in $requestData
         $requestData['user_id'] = $requestData['user_id'];
@@ -196,16 +209,21 @@ public function smscancel(Request $request)
         $requestData['payment_amount'] = $orderSum + $requestData['charge'] - $requestData['coupon'];
 
         // If use_coin is yes, deduct reward points from payment_amount
-        if (isset($requestData['use_coin']) && $requestData['use_coin'] === 'yes') {
-            $user = User::find($requestData['user_id']);
-            if ($user && $user->reward_points > 0) {
-                // 1 reward point = 1 rupee (adjust if needed)
-                $deduct = min($user->reward_points, $requestData['payment_amount']);
-                $requestData['payment_amount'] -= $deduct;
-                $user->reward_points -= $deduct;
-                $user->save();
-            }
-        }
+        // if (isset($requestData['use_coin']) && $requestData['use_coin'] === 'yes') {
+        //     $user = User::find($requestData['user_id']);
+        //     if ($user && $user->reward_points > 0) {
+        //         // 1 reward point = 1 rupee (adjust if needed)
+        //         $deduct = min($user->reward_points, $requestData['payment_amount']);
+        //         dd($requestData['payment_amount'], $deduct);
+
+        //         // --- Store the deducted amount ---
+        //         $requestData['reward_amount'] = (float) $deduct;
+
+        //         $requestData['payment_amount'] -= $deduct;
+        //         $user->reward_points -= $deduct;
+        //         $user->save();
+        //     }
+        // }
 
         $timeslotData = TimeSlot::find($requestData['time_slot_id']);
         $requestData['del_dt'] = $requestData['date'];
@@ -215,9 +233,9 @@ public function smscancel(Request $request)
         // Validate the incoming request data
         $validator = Validator::make($requestData, [
             'invoice_dt' => 'nullable|date',
-            'charge' => 'required',
-            'coupon' => 'required',
-            'wallet' => 'required',
+            'charge' => 'required|numeric',
+            'coupon' => 'required|numeric',
+            'wallet' => 'required|numeric',
             'user' => 'nullable|string',
             'finyear' => 'string',
             'payment_status' => 'required',
@@ -226,7 +244,6 @@ public function smscancel(Request $request)
             'del_dt' => 'required',
             'ref' => 'required',
             'ref1' => 'required',
-            'user' => 'nullable|string',
             'pack_user' => 'nullable|string',
         ]);
 
@@ -234,6 +251,7 @@ public function smscancel(Request $request)
             return response(['error' => $validator->errors()], 400);
         }
 
+        // The 'reward_amount' will now be saved along with the rest of the data
         $orderBook = OrderBook::create($requestData);
 
         $updateOrder = Order::where('user_id', $requestData['user_id'])
@@ -252,7 +270,6 @@ public function smscancel(Request $request)
         $orderBookData = OrderBook::find($orderBook->id);
         return response(['message' => 'Order created successfully', 'oderBook' => $orderBookData], 201);
     }
-
     /*
     public function createOrderBook(Request $request)
     {
@@ -323,26 +340,27 @@ public function smscancel(Request $request)
         ->get();
         return response()->json($orders, 200);
     }
-    
-    
-    
-        public function cancelOrder(Request $request)
+
+
+
+    public function cancelOrder(Request $request)
     {
         $date = Carbon::now();
         $orderBookData = OrderBook::find($request->order_book_id);
         $timeslotData = TimeSlot::find($orderBookData->ref);
-
-   	if ($orderBookData->status !== 'order') {
-        $status = 'you can not cancel this order';
-    	}
-
-        if($orderBookData->del_dt < $date->format('Y-m-d') ||
-        ($orderBookData->del_dt == $date->format('Y-m-d') && $date->format('H') > $timeslotData->ref1))
-        {
+        if ($orderBookData->status === 'cancel') {
+            return response()->json(['status' => 'This order has already been cancelled.'], 400);
+        }
+        if ($orderBookData->status !== 'order') {
             $status = 'you can not cancel this order';
         }
-        else
-        {
+
+        if (
+            $orderBookData->del_dt < $date->format('Y-m-d') ||
+            ($orderBookData->del_dt == $date->format('Y-m-d') && $date->format('H') > $timeslotData->ref1)
+        ) {
+            $status = 'you can not cancel this order';
+        } else {
             $walletAmtByOrderBook = Wallet::find($orderBookData->wallet_id);
             $orderSum = $orderBookData['payment_amount'] + $walletAmtByOrderBook;
             $wallet = Wallet::create([
@@ -353,25 +371,35 @@ public function smscancel(Request $request)
             ]);
 
             $updateOrderBook = OrderBook::where('id', $request->order_book_id)
-            ->update(['status' => 'cancel']);
-
-            $ordersList = Order::where('order_book_id', $request->order_book_id)->get();
-            foreach($ordersList as $list){
-                $order_id = $list->id;
-                Order::where('id',$order_id)
                 ->update(['status' => 'cancel']);
+            // --- Logic to find and refund reward points ---
+            $ordersList = Order::where('order_book_id', $request->order_book_id)->get();
+            $totalPointsToRefund = $ordersList->sum('reward_discount');
+
+            $userData = User::find($request->user_id);
+
+            if ($totalPointsToRefund > 0) {
+                $userData->reward_points += $totalPointsToRefund;
+                $userData->save();
+            }
+            // --- End of reward point logic ---
+            $ordersList = Order::where('order_book_id', $request->order_book_id)->get();
+            foreach ($ordersList as $list) {
+                $order_id = $list->id;
+                Order::where('id', $order_id)
+                    ->update(['status' => 'cancel']);
                 Notification::create([
                     'food_id' => $list->food_id,
-                    'order_id' =>$order_id,
+                    'order_id' => $order_id,
                     'message' => 'Product Cancelled',
                     'general' => 'no',
                     'status' => 'yes'
                 ]);
             }
             $status = 'success';
-            
-            $userData = User::find($request->user_id);   
-            $mobileNumber = $userData->mobile; 
+
+            $userData = User::find($request->user_id);
+            $mobileNumber = $userData->mobile;
             $templateID = '1207171377044163620';
             $message = "Dear {$userData->name},
             We've successfully cancelled your order #{$request->order_book_id}. The amount for the cancelled items has been added to your wallet balance. You can use this balance for your future purchases.
@@ -386,11 +414,11 @@ public function smscancel(Request $request)
             }
         }
 
-        return response()->json(['status' => $status ]);
+        return response()->json(['status' => $status]);
     }
-    
-    
-   /* 
+
+
+    /* 
     public function cancelOrder(Request $request)
     {
              $wallet = Wallet::create([
@@ -417,7 +445,7 @@ public function smscancel(Request $request)
         }
         return response()->json(['status' => 'success']);
     }*/
-    
+
     public function ordersHistory(Request $request)
    {
          $orders = OrderBook::where('user_id', $request->user_id)
