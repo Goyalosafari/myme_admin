@@ -57,9 +57,6 @@
                                     <input type="checkbox" id="checkbox1" class='form-check-input' >
                                     <label for="checkbox1">Remember me</label>
                                 </div>
-                                <div class="float-end">
-                                    <a href="{{url('admin/register')}}">Don't have an account?</a>
-                                </div>
                             </div>
                             <div class="clearfix">
                                 <button class="btn btn-primary float-end">Submit</button>

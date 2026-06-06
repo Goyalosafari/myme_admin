@@ -41,7 +41,7 @@ Route::post('/admin/register',[RegisterController::class, 'register'])->name('ad
 Route::get('admin/login',[LoginController::class, 'showLoginForm'])->name('admin.login');
 Route::post('admin/login',[LoginController::class, 'login'])->name('login');
 
-Route::middleware(['auth:admin', 'web', 'prevent-back-history'])->group(function(){
+Route::middleware(['admin.auth', 'web', 'prevent-back-history'])->group(function(){
 
    // Route::get('/dashboard', function() {
      //   return view('dashboard');
