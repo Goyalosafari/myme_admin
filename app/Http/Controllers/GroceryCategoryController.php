@@ -42,7 +42,7 @@ class GroceryCategoryController extends Controller
         }
         $category->save();
         
-        return redirect('/grocery/category')->with('success','Category created successfully');
+        return redirect()->route('grocery_category.index')->with('success','Category created successfully');
     }
 
     public function edit($id)
@@ -70,12 +70,12 @@ class GroceryCategoryController extends Controller
         }
         $category->save();
 
-        return redirect('/grocery/category')->with('success','Category updated successfully');
+        return redirect()->route('grocery_category.index')->with('success','Category updated successfully');
     }
     public function destroy($id)
     {
         $category = $this->category->find($id);
         $category->delete();
-        return redirect('grocery/category')->with('success','Category Deleted successfully');
+        return redirect()->route('grocery_category.index')->with('success','Category Deleted successfully');
     }
 }

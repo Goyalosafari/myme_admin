@@ -40,7 +40,7 @@ class CategoryController extends Controller
         }
         $category->save();
         
-        return redirect('/category')->with('success','Category created successfully');
+        return redirect()->route('category.index')->with('success','Category created successfully');
     }
 
     public function edit($id)
@@ -68,12 +68,12 @@ class CategoryController extends Controller
         }
         $category->save();
 
-        return redirect('/category')->with('success','Category updated successfully');
+        return redirect()->route('category.index')->with('success','Category updated successfully');
     }
     public function destroy($id)
     {
         $category = $this->category->find($id);
         $category->delete();
-        return redirect('/category')->with('success','Category Deleted successfully');
+        return redirect()->route('category.index')->with('success','Category Deleted successfully');
     }
 }

@@ -31,7 +31,7 @@ class NotificationController extends Controller
         $data->status = 'yes';
         $data->save();
 
-        return redirect('/notification')->with('success','Notification created successfully');
+        return redirect()->route('notification.index')->with('success','Notification created successfully');
     }
 
     public function edit($id)
@@ -51,12 +51,12 @@ class NotificationController extends Controller
         $data->message = $request->input('message');
         $data->save();
 
-        return redirect('/notification')->with('success','Notification updated successfully');
+        return redirect()->route('notification.index')->with('success','Notification updated successfully');
     }
     public function destroy($id)
     {
         $notification = $this->notification->find($id);
         $notification->delete();
-        return redirect('/notification')->with('success','Notification Deleted successfully');
+        return redirect()->route('notification.index')->with('success','Notification Deleted successfully');
     }
 }

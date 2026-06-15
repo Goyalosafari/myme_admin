@@ -7,7 +7,7 @@
             <ul class="menu">
                 <li class='sidebar-title'>Main menus</li>
                 <li class="sidebar-item {{ request()->is('/dashboard') ? 'active' : '' }}">
-                    <a href="{{url('/dashboard')}}" class='sidebar-link'>
+                    <a href="{{ route('dashboard') }}" class='sidebar-link'>
                         <i data-feather="home" width="20"></i> 
                         <span>Dashboard</span>
                     </a>        

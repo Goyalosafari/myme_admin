@@ -27,7 +27,7 @@
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class='breadcrumb-header'>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{url('/dashboard')}}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Grocery Product</li>
                     </ol>
                 </nav>
@@ -91,7 +91,7 @@
                             <td><img src="{{ asset('storage/' .$data->image)}}" alt="{{$data->image}}" srcset="" width="70px"></td>
                             <td>
                                 <a href="#grocery-form" class="btn icon btn-primary edit-grocery-btn" data-id="{{$data->id}}"><i data-feather="edit"></i></a>
-                                <form id="deleteForm" style="display: inline;" action="{{ url('/grocery/product/delete/'. $data->id) }}" method="POST">
+                                <form id="deleteForm" style="display: inline;" action="{{ route('grocery_product.destroy', $data->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn icon btn-danger" onclick="return confirm('Are you sure you want to delete?')">
@@ -340,7 +340,7 @@
                 
                 //make an AJAX request to fetch the grocery data
                 $.ajax({
-                   url: '/grocery/product/'+ groceryId + '/edit',
+                   url: '{{ route('grocery_product.edit', '__ID__') }}'.replace('__ID__', groceryId),
                    method : 'GET',
                    success: function(data){
                     // Populate the form fields with the fetched data
@@ -364,7 +364,7 @@
                     $('#imagePreview').attr('src',imgPath);
                    
                     // Adjust the form action, method, and submit button text for update
-                    $('#groceryForm').attr('action', '{{ url('grocery/product/update') }}'+'/'+ groceryId);
+                    $('#groceryForm').attr('action', '{{ route('grocery_product.update', 0) }}'.slice(0, -1) + groceryId);
                     $('#groceryForm').append('<input type="hidden" name="_method" value="PUT">'); // Add the _method field
                     $('#groceryForm').append('<input type="hidden" name="_token" value="{{ csrf_token() }}">'); // Add the CSRF token field
                     $('#submitBtn').text('Update');

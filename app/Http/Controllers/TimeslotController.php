@@ -36,7 +36,7 @@ class TimeslotController extends Controller
         $data->status = 'y';
         $data->save();
 
-        return redirect('/timeslot')->with('success','Timeslot created successfully');
+        return redirect()->route('timeslot.index')->with('success','Timeslot created successfully');
     }
 
     public function edit($id)
@@ -63,12 +63,12 @@ class TimeslotController extends Controller
         $data->ref1 = $request->input('ref1');
         $data->save();
 
-        return redirect('/timeslot')->with('success','Timeslot updated successfully');
+        return redirect()->route('timeslot.index')->with('success','Timeslot updated successfully');
     }
     public function destroy($id)
     {
         $time_slot = $this->time_slot->find($id);
         $time_slot->delete();
-        return redirect('/timeslot')->with('success','Timeslot Deleted successfully');
+        return redirect()->route('timeslot.index')->with('success','Timeslot Deleted successfully');
     }
 }

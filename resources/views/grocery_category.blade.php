@@ -17,7 +17,7 @@
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class='breadcrumb-header'>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{url('/dashboard')}}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Grocery Category</li>
                     </ol>
                 </nav>
@@ -157,7 +157,7 @@
                 
                 //make an AJAX request to fetch the category data
                 $.ajax({
-                   url: '/grocery/category/'+ categoryId + '/edit',
+                   url: '{{ route('grocery_category.edit', '__ID__') }}'.replace('__ID__', categoryId),
                    method : 'GET',
                    success: function(data){
                     // Populate the form fields with the fetched data
@@ -169,7 +169,7 @@
                     $('#imagePreview').attr('src',imgPath);
 
                     // Adjust the form action, method, and submit button text for update
-                    $('#categoryForm').attr('action', '{{ url('/grocery/category/update') }}'+'/'+ categoryId);
+                    $('#categoryForm').attr('action', '{{ route('grocery_category.update', 0) }}'.slice(0, -1) + categoryId);
                     $('#categoryForm').append('<input type="hidden" name="_method" value="PUT">'); // Add the _method field
                     $('#categoryForm').append('<input type="hidden" name="_token" value="{{ csrf_token() }}">'); // Add the CSRF token field
                     $('#submitBtn').text('Update');

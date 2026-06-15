@@ -17,7 +17,7 @@
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class='breadcrumb-header'>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{url('/dashboard')}}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Coupon</li>
                     </ol>
                 </nav>
@@ -65,7 +65,7 @@
                             <td>{{$data->to_date}}</td>
                             <td>
                                 <a href="#coupen-form" class="btn icon btn-primary edit-coupen-btn" data-id="{{$data->id}}"><i data-feather="edit"></i></a>
-                                <form id="deleteForm" style="display: inline;" action="{{ url('/coupen/delete/'. $data->id) }}" method="POST">
+                                <form id="deleteForm" style="display: inline;" action="{{ route('coupen.destroy', $data->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn icon btn-danger" onclick="return confirm('Are you sure you want to delete?')">
@@ -228,7 +228,7 @@
                 
                 //make an AJAX request to fetch the coupen data
                 $.ajax({
-                   url: '/coupen/'+ coupenId + '/edit',
+                   url: '{{ route('coupen.edit', '__ID__') }}'.replace('__ID__', coupenId),
                    method : 'GET',
                    success: function(data){
                     // Populate the form fields with the fetched data
@@ -244,7 +244,7 @@
 
                    
                     // Adjust the form action, method, and submit button text for update
-                    $('#coupenForm').attr('action', '{{ url('coupen/update') }}'+'/'+ coupenId);
+                    $('#coupenForm').attr('action', '{{ route('coupen.update', 0) }}'.slice(0, -1) + coupenId);
                     $('#coupenForm').append('<input type="hidden" name="_method" value="PUT">'); // Add the _method field
                     $('#coupenForm').append('<input type="hidden" name="_token" value="{{ csrf_token() }}">'); // Add the CSRF token field
                     $('#submitBtn').text('Update');

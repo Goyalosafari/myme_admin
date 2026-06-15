@@ -17,7 +17,7 @@
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class='breadcrumb-header'>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{url('/dashboard')}}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Pincode</li>
                     </ol>
                 </nav>
@@ -59,7 +59,7 @@
                             <td>{{$data->other_fee}}</td>
                             <td>
                                 <a href="#pincode-form" class="btn icon btn-primary edit-pincode-btn" data-id="{{$data->id}}"><i data-feather="edit"></i></a>
-                                <form id="deleteForm" style="display: inline;" action="{{ url('/pincode/delete/'. $data->id) }}" method="POST">
+                                <form id="deleteForm" style="display: inline;" action="{{ route('pincode.destroy', $data->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn icon btn-danger" onclick="return confirm('Are you sure you want to delete?')">
@@ -189,7 +189,7 @@
                 
                 //make an AJAX request to fetch the pincode data
                 $.ajax({
-                   url: '/pincode/'+ pincodeId + '/edit',
+                   url: '{{ route('pincode.edit', '__ID__') }}'.replace('__ID__', pincodeId),
                    method : 'GET',
                    success: function(data){
                     // Populate the form fields with the fetched data
@@ -201,7 +201,7 @@
                     $('#other_fee').val(data.other_fee);
                     
                     // Adjust the form action, method, and submit button text for update
-                    $('#pincodeForm').attr('action', '{{ url('pincode/update') }}'+'/'+ pincodeId);
+                    $('#pincodeForm').attr('action', '{{ route('pincode.update', 0) }}'.slice(0, -1) + pincodeId);
                     $('#pincodeForm').append('<input type="hidden" name="_method" value="PUT">'); // Add the _method field
                     $('#pincodeForm').append('<input type="hidden" name="_token" value="{{ csrf_token() }}">'); // Add the CSRF token field
                     $('#submitBtn').text('Update');

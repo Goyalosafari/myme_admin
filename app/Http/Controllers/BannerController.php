@@ -40,7 +40,7 @@ class BannerController extends Controller
         }
         $banner->save();
 
-        return redirect('/banner')->with('success','Banner created successfully');
+        return redirect()->route('banner.index')->with('success','Banner created successfully');
     }
 
     public function edit($id)
@@ -67,12 +67,12 @@ class BannerController extends Controller
         }
         $banner->save();
 
-        return redirect('/banner')->with('success','Banner updated successfully');
+        return redirect()->route('banner.index')->with('success','Banner updated successfully');
     }
     public function destroy($id)
     {
         $banner = $this->banner->find($id);
         $banner->delete();
-        return redirect('/banner')->with('success','Banner Deleted successfully');
+        return redirect()->route('banner.index')->with('success','Banner Deleted successfully');
     }
 }

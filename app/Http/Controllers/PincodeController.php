@@ -37,7 +37,7 @@ class PincodeController extends Controller
 
         $pincode->save();
 
-        return redirect('/pincode')->with('success','Pincode created successfully');
+        return redirect()->route('pincode.index')->with('success','Pincode created successfully');
     }
 
     public function edit($id)
@@ -63,12 +63,12 @@ class PincodeController extends Controller
         $pincode->other_fee = $request->input('other_fee');
         $pincode->save();
 
-        return redirect('/pincode')->with('success','Pincode updated successfully');
+        return redirect()->route('pincode.index')->with('success','Pincode updated successfully');
     }
     public function destroy($id)
     {
         $pincode = $this->pincode->find($id);
         $pincode->delete();
-        return redirect('/pincode')->with('success','Pincode Deleted successfully');
+        return redirect()->route('pincode.index')->with('success','Pincode Deleted successfully');
     }
 }

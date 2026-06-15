@@ -55,7 +55,7 @@ class GroceryProductController extends Controller
         }
         $food->save();
         
-        return redirect('/grocery/product')->with('success','Product created successfully');
+        return redirect()->route('grocery_product.index')->with('success','Product created successfully');
     }
 
     public function edit($id)
@@ -96,12 +96,12 @@ class GroceryProductController extends Controller
         }
         $food->save();
 
-        return redirect('/grocery/product')->with('success','Product updated successfully');
+        return redirect()->route('grocery_product.index')->with('success','Product updated successfully');
     }
     public function destroy($id)
     {
         $food = $this->food->find($id);
         $food->delete();
-        return redirect('/grocery/product')->with('success','Product Deleted successfully');
+        return redirect()->route('grocery_product.index')->with('success','Product Deleted successfully');
     }
 }

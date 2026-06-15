@@ -1,6 +1,7 @@
 <?php
 use App\Http\Controllers\Auth\AuthApiController;
 use App\Http\Controllers\Auth\RegisterApiController;
+use App\Http\Controllers\Auth\OtpApiController;
 
 use App\Http\Controllers\Api\BannerApiController;
 use App\Http\Controllers\Api\CategoryApiController;
@@ -40,8 +41,13 @@ Route::post('/order-sms', [OrderBookApiController::class, 'smsorder']);
 Route::post('/cancel-sms', [OrderBookApiController::class, 'smscancel']);
 ///Route::post('/send-otp', [OrderBookApiController::class, 'sendOtp']);
 
-Route::post('/deactivate-user', [UserController::class, 'deactivatewebUser']);
+Route::post('/deactivate-user', [UserApiController::class, 'deactivateUser']);
 
+
+Route::post('/send-otp', [OtpApiController::class, 'sendOtp']);
+Route::post('/verify-otp', [OtpApiController::class, 'verifyOtp']);
+Route::post('/send-register-otp', [OtpApiController::class, 'sendRegisterOtp']);
+Route::post('/verify-register-otp', [OtpApiController::class, 'verifyRegisterOtp']);
 
 Route::post('/login', [AuthApiController::class, 'login']);
 Route::post('/forgot-password', [AuthApiController::class, 'forgot'])->name('password.reset');
@@ -129,6 +135,7 @@ Route::post('/addToCart', [OrderApiController::class, 'addToCart']);
     
       Route::get('/Userprofile', [UserApiController::class,'userInfo']);
     Route::post('/update-profile', [UserApiController::class,'update']);
+    Route::post('/apply-reward-points', [UserApiController::class,'applyRewardPoints']);
     
     Route::get('/pincode', [PincodeApiController ::class, 'index']);
 Route::post('/pincodeValidation', [PincodeApiController ::class, 'pincodeValidation']);

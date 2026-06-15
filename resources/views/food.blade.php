@@ -39,7 +39,7 @@
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class='breadcrumb-header'>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{url('/dashboard')}}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Food</li>
                     </ol>
                 </nav>
@@ -385,7 +385,7 @@
                 
                 //make an AJAX request to fetch the food data
                 $.ajax({
-                   url: '/food/'+ foodId + '/edit',
+                   url: '{{ route('food.edit', '__ID__') }}'.replace('__ID__', foodId),
                    method : 'GET',
                    success: function(data){console.log(data)
                     // Populate the form fields with the fetched data
@@ -412,7 +412,7 @@
                     $('#imagePreview').attr('src',imgPath);
                    
                     // Adjust the form action, method, and submit button text for update
-                    $('#foodForm').attr('action', '{{ url('food/update') }}'+'/'+ foodId);
+                    $('#foodForm').attr('action', '{{ route('food.update', 0) }}'.slice(0, -1) + foodId);
                     $('#foodForm').append('<input type="hidden" name="_method" value="PUT">'); // Add the _method field
                     $('#foodForm').append('<input type="hidden" name="_token" value="{{ csrf_token() }}">'); // Add the CSRF token field
                     $('#submitBtn').text('Update');

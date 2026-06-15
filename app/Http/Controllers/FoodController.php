@@ -61,7 +61,7 @@ class FoodController extends Controller
             $food->save();
             $food->categories()->attach($request->input('categories'));
     
-            return redirect('/food')->with('success','Food created successfully');
+            return redirect()->route('food.index')->with('success','Food created successfully');
         }catch(\Exception $e){
             \Log::error('Error storing food', ['exception' => $e]);
             return redirect()->route('error.server_error');
@@ -113,12 +113,12 @@ class FoodController extends Controller
         $food->save();
          $food->categories()->sync($request->input('categories'));
 
-        return redirect('/food')->with('success','Food updated successfully');
+        return redirect()->route('food.index')->with('success','Food updated successfully');
     }
     public function destroy($id)
     {
         $food = $this->food->find($id);
         $food->delete();
-        return redirect('/food')->with('success','Food Deleted successfully');
+        return redirect()->route('food.index')->with('success','Food Deleted successfully');
     }
 }

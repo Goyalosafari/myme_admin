@@ -18,9 +18,39 @@ class UserApiController extends Controller
     
         public function userInfo(Request $request)
     {
-        
-        $user = User::where('id', $request->user_id)->get();
-         return response()->json(['user'=>$user], 200);
+        $user = User::where('id', $request->user_id)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        // Build addresses array from flat DB fields
+        $addresses = [];
+
+        if (!empty($user->address1)) {
+            $addresses[] = [
+                'type'     => 'home',
+                'address'  => $user->address1,
+                'pincode'  => $user->pincode1  ?? '',
+                'landmark' => $user->landmark1 ?? '',
+                'phone'    => $user->mobile    ?? '',
+            ];
+        }
+
+        if (!empty($user->address2)) {
+            $addresses[] = [
+                'type'     => 'work',
+                'address'  => $user->address2,
+                'pincode'  => $user->pincode2  ?? '',
+                'landmark' => $user->landmark2 ?? '',
+                'phone'    => $user->mobile    ?? '',
+            ];
+        }
+
+        $userData               = $user->toArray();
+        $userData['addresses']  = $addresses;
+
+        return response()->json(['user' => $userData], 200);
     }
 
 /// $requestData['user_id'];
@@ -58,6 +88,12 @@ class UserApiController extends Controller
     }
     
     
+    public function applyRewardPoints(Request $request)
+    {
+        // Flutter handles wallet deduction locally; this endpoint just acknowledges the preference.
+        return response()->json(['status' => 'success', 'use_points' => $request->use_points], 200);
+    }
+
     public function deactivateUser(Request $request)
     {
         $user = User::where('id', $request->user_id)->first();

@@ -56,7 +56,7 @@ class RecipeController extends Controller
         }
         $recipe->save();
 
-        return redirect('/recipe')->with('success','Recipe created successfully');
+        return redirect()->route('recipe.index')->with('success','Recipe created successfully');
     }
 
     public function edit($id)
@@ -95,12 +95,12 @@ class RecipeController extends Controller
         }
         $recipe->save();
 
-        return redirect('/recipe')->with('success','Recipe updated successfully');
+        return redirect()->route('recipe.index')->with('success','Recipe updated successfully');
     }
     public function destroy($id)
     {
         $recipe = $this->recipe->find($id);
         $recipe->delete();
-        return redirect('/recipe')->with('success','Recipe Deleted successfully');
+        return redirect()->route('recipe.index')->with('success','Recipe Deleted successfully');
     }
 }

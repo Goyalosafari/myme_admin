@@ -21,7 +21,7 @@
                 <div class="card-body">
                     <div class="text-center mb-5">
                         <img src="{{asset('images/favicon.svg')}}" height="48" class='mb-4'>
-                        <h3><a href="{{'/admin/login'}}" > Click Here To Log In</a></h3>
+                        <h3><a href="{{ route('admin.login') }}" > Click Here To Log In</a></h3>
                     </div>
                 </div>
             </div>

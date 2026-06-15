@@ -1,0 +1,749 @@
+{
+  "info": {
+    "name": "Myme Admin",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost/myme_admin" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Show Login Form",
+          "request": { "method": "GET", "url": "{{base_url}}/admin/login" }
+        },
+        {
+          "name": "Login (Send OTP)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/admin/login",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "email", "value": "parvathykrenjith@gmail.com" },
+                { "key": "password", "value": "Admin@12345" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Show OTP Form",
+          "request": { "method": "GET", "url": "{{base_url}}/admin/otp" }
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/admin/otp",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "otp", "value": "123456" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/admin/logout",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [{ "key": "_token", "value": "{{csrf_token}}" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Dashboard",
+          "request": { "method": "GET", "url": "{{base_url}}/dashboard" }
+        }
+      ]
+    },
+    {
+      "name": "Banner",
+      "item": [
+        {
+          "name": "List Banners",
+          "request": { "method": "GET", "url": "{{base_url}}/banner" }
+        },
+        {
+          "name": "Create Banner",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/banner/post",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "image", "value": "" },
+                { "key": "status", "value": "1" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Edit Banner",
+          "request": { "method": "GET", "url": "{{base_url}}/banner/1/edit" }
+        },
+        {
+          "name": "Update Banner",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/banner/update/1",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "_method", "value": "PUT" },
+                { "key": "status", "value": "1" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Banner",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/banner/delete/1",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "_method", "value": "DELETE" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Category",
+      "item": [
+        {
+          "name": "List Categories",
+          "request": { "method": "GET", "url": "{{base_url}}/category" }
+        },
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/category/post",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "name", "value": "Category Name" },
+                { "key": "status", "value": "1" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Edit Category",
+          "request": { "method": "GET", "url": "{{base_url}}/category/1/edit" }
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/category/update/1",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "_method", "value": "PUT" },
+                { "key": "name", "value": "Updated Name" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/category/delete/1",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "_method", "value": "DELETE" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Food",
+      "item": [
+        {
+          "name": "List Foods",
+          "request": { "method": "GET", "url": "{{base_url}}/food" }
+        },
+        {
+          "name": "Create Food",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/food/post",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "name", "value": "Food Name" },
+                { "key": "price", "value": "100" },
+                { "key": "category_id", "value": "1" },
+                { "key": "status", "value": "1" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Edit Food",
+          "request": { "method": "GET", "url": "{{base_url}}/food/1/edit" }
+        },
+        {
+          "name": "Update Food",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/food/update/1",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "_method", "value": "PUT" },
+                { "key": "name", "value": "Updated Food" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Food",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/food/delete/1",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "_method", "value": "DELETE" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Recipe",
+      "item": [
+        {
+          "name": "List Recipes",
+          "request": { "method": "GET", "url": "{{base_url}}/recipe" }
+        },
+        {
+          "name": "Create Recipe",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/recipe/post",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "name", "value": "Recipe Name" },
+                { "key": "status", "value": "1" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Edit Recipe",
+          "request": { "method": "GET", "url": "{{base_url}}/recipe/1/edit" }
+        },
+        {
+          "name": "Update Recipe",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/recipe/update/1",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "_method", "value": "PUT" },
+                { "key": "name", "value": "Updated Recipe" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Recipe",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/recipe/delete/1",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "_method", "value": "DELETE" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Grocery Category",
+      "item": [
+        {
+          "name": "List Grocery Categories",
+          "request": { "method": "GET", "url": "{{base_url}}/grocery/category" }
+        },
+        {
+          "name": "Create Grocery Category",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/grocery/category/post",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "name", "value": "Grocery Category" },
+                { "key": "status", "value": "1" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Edit Grocery Category",
+          "request": { "method": "GET", "url": "{{base_url}}/grocery/category/1/edit" }
+        },
+        {
+          "name": "Update Grocery Category",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/grocery/category/update/1",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "_method", "value": "PUT" },
+                { "key": "name", "value": "Updated Grocery Category" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Grocery Category",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/grocery/category/delete/1",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "_method", "value": "DELETE" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Grocery Product",
+      "item": [
+        {
+          "name": "List Grocery Products",
+          "request": { "method": "GET", "url": "{{base_url}}/grocery/product" }
+        },
+        {
+          "name": "Create Grocery Product",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/grocery/product/post",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "name", "value": "Product Name" },
+                { "key": "price", "value": "50" },
+                { "key": "grocery_category_id", "value": "1" },
+                { "key": "status", "value": "1" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Edit Grocery Product",
+          "request": { "method": "GET", "url": "{{base_url}}/grocery/product/1/edit" }
+        },
+        {
+          "name": "Update Grocery Product",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/grocery/product/update/1",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "_method", "value": "PUT" },
+                { "key": "name", "value": "Updated Product" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Grocery Product",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/grocery/product/delete/1",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "_method", "value": "DELETE" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Coupon",
+      "item": [
+        {
+          "name": "List Coupons",
+          "request": { "method": "GET", "url": "{{base_url}}/coupen" }
+        },
+        {
+          "name": "Create Coupon",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/coupen/post",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "code", "value": "SAVE10" },
+                { "key": "discount", "value": "10" },
+                { "key": "status", "value": "1" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Edit Coupon",
+          "request": { "method": "GET", "url": "{{base_url}}/coupen/1/edit" }
+        },
+        {
+          "name": "Update Coupon",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/coupen/update/1",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "_method", "value": "PUT" },
+                { "key": "code", "value": "SAVE20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Coupon",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/coupen/delete/1",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "_method", "value": "DELETE" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Timeslot",
+      "item": [
+        {
+          "name": "List Timeslots",
+          "request": { "method": "GET", "url": "{{base_url}}/timeslot" }
+        },
+        {
+          "name": "Create Timeslot",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/timeslot/post",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "start_time", "value": "09:00" },
+                { "key": "end_time", "value": "10:00" },
+                { "key": "status", "value": "1" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Edit Timeslot",
+          "request": { "method": "GET", "url": "{{base_url}}/timeslot/1/edit" }
+        },
+        {
+          "name": "Update Timeslot",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/timeslot/update/1",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "_method", "value": "PUT" },
+                { "key": "start_time", "value": "10:00" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Timeslot",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/timeslot/delete/1",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "_method", "value": "DELETE" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notification",
+      "item": [
+        {
+          "name": "List Notifications",
+          "request": { "method": "GET", "url": "{{base_url}}/notification" }
+        },
+        {
+          "name": "Create Notification",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/notification/post",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "title", "value": "Notification Title" },
+                { "key": "message", "value": "Notification message body" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Edit Notification",
+          "request": { "method": "GET", "url": "{{base_url}}/notification/1/edit" }
+        },
+        {
+          "name": "Update Notification",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/notification/update/1",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "_method", "value": "PUT" },
+                { "key": "title", "value": "Updated Title" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Notification",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/notification/delete/1",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "_method", "value": "DELETE" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pincode",
+      "item": [
+        {
+          "name": "List Pincodes",
+          "request": { "method": "GET", "url": "{{base_url}}/pincode" }
+        },
+        {
+          "name": "Create Pincode",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/pincode/post",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "pincode", "value": "682001" },
+                { "key": "status", "value": "1" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Edit Pincode",
+          "request": { "method": "GET", "url": "{{base_url}}/pincode/1/edit" }
+        },
+        {
+          "name": "Update Pincode",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/pincode/update/1",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "_method", "value": "PUT" },
+                { "key": "pincode", "value": "682002" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Pincode",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/pincode/delete/1",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "_method", "value": "DELETE" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "List Orders",
+          "request": { "method": "GET", "url": "{{base_url}}/orderbook" }
+        },
+        {
+          "name": "Order Details",
+          "request": { "method": "GET", "url": "{{base_url}}/orderDetails/1" }
+        },
+        {
+          "name": "Update Order Status",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/changeOrderStatus/1",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "status", "value": "delivered" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Feedback",
+      "item": [
+        {
+          "name": "List Feedback",
+          "request": { "method": "GET", "url": "{{base_url}}/feedback" }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "List Users",
+          "request": { "method": "GET", "url": "{{base_url}}/users" }
+        },
+        {
+          "name": "Change Password Form",
+          "request": { "method": "GET", "url": "{{base_url}}/change-password" }
+        },
+        {
+          "name": "Update Password",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/change-password",
+            "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "_token", "value": "{{csrf_token}}" },
+                { "key": "current_password", "value": "Admin@12345" },
+                { "key": "new_password", "value": "NewPass@123" },
+                { "key": "new_password_confirmation", "value": "NewPass@123" }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

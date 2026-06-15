@@ -38,7 +38,7 @@
                             <div class="dropdown-menu dropdown-menu-end" >
                                 <a class="dropdown-item" href="#"><i data-feather="user"></i> Account</a>
                                 <a class="dropdown-item active" href="#"><i data-feather="mail"></i> Messages</a>
-                                <a class="dropdown-item" href="{{ url('change-password') }}"><i data-feather="key"></i> Change Password</a>
+                                <a class="dropdown-item" href="{{ route('change-password') }}"><i data-feather="key"></i> Change Password</a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="#"><i data-feather="log-out"></i> Logout</a>
                             </div>
@@ -48,12 +48,12 @@
                                 <div class="avatar me-1">
                                     <img src="{{asset('images/avatar/avatar-s-1.png')}}" alt="" srcset="">
                                 </div>
-                                <div class="d-none d-md-block d-lg-inline-block">Hi, {{Auth::user()->name}}</div>
+                                <div class="d-none d-md-block d-lg-inline-block">Hi, {{ env('ADMIN_NAME', 'Admin') }}</div>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <a class="dropdown-item" href="#"><i data-feather="user"></i> Account</a>
                                 <a class="dropdown-item active" href="#"><i data-feather="mail"></i> Messages</a>
-                                <a class="dropdown-item" href="{{ url('change-password') }}"><i data-feather="key"></i> Change Password</a>
+                                <a class="dropdown-item" href="{{ route('change-password') }}"><i data-feather="key"></i> Change Password</a>
                                 <div class="dropdown-divider"></div>
                                 <form method="POST" action="{{ route('admin.logout') }}">
                                     @csrf

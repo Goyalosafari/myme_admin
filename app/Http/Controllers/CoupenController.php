@@ -39,7 +39,7 @@ class CoupenController extends Controller
         $coupen->to_date = $request->input('to_date'); 
         $coupen->save();
 
-        return redirect('/coupen')->with('success','Coupen created successfully');
+        return redirect()->route('coupen.index')->with('success','Coupen created successfully');
     }
 
     public function edit($id)
@@ -68,12 +68,12 @@ class CoupenController extends Controller
         $coupen->to_date = $request->input('to_date'); 
         $coupen->save();
 
-        return redirect('/coupen')->with('success','Coupen updated successfully');
+        return redirect()->route('coupen.index')->with('success','Coupen updated successfully');
     }
     public function destroy($id)
     {
         $coupen = $this->coupen->find($id);
         $coupen->delete();
-        return redirect('/coupen')->with('success','Coupen Deleted successfully');
+        return redirect()->route('coupen.index')->with('success','Coupen Deleted successfully');
     }
 }

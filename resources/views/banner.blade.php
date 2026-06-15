@@ -17,7 +17,7 @@
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class='breadcrumb-header'>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{url('/dashboard')}}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Banner</li>
                     </ol>
                 </nav>
@@ -66,7 +66,7 @@
                             <td>{{($data->category != null ? $data->category->title : '')}}</td>
                             <td>
                                 <a class="btn icon btn-primary edit-banner-btn" data-id="{{$data->id}}"><i data-feather="edit"></i></a>
-                                <form id="deleteForm" style="display: inline;" action="{{ url('/banner/delete/'. $data->id) }}" method="POST">
+                                <form id="deleteForm" style="display: inline;" action="{{ route('banner.destroy', $data->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn icon btn-danger" onclick="return confirm('Are you sure you want to delete?')">
@@ -189,7 +189,7 @@
                 
                 //make an AJAX request to fetch the banner data
                 $.ajax({
-                   url: '/banner/'+ bannerId + '/edit',
+                   url: '{{ route('banner.edit', '__ID__') }}'.replace('__ID__', bannerId),
                    method : 'GET',
                    success: function(data){
                     // Populate the form fields with the fetched data
@@ -202,7 +202,7 @@
                     $('#imagePreview').attr('src',imgPath);
 
                     // Adjust the form action, method, and submit button text for update
-                    $('#bannerForm').attr('action', '{{ url('banner/update') }}'+'/'+ bannerId);
+                    $('#bannerForm').attr('action', '{{ route('banner.update', 0) }}'.slice(0, -1) + bannerId);
                     $('#bannerForm').append('<input type="hidden" name="_method" value="PUT">'); // Add the _method field
                     $('#bannerForm').append('<input type="hidden" name="_token" value="{{ csrf_token() }}">'); // Add the CSRF token field
                     $('#submitBtn').text('Update');
