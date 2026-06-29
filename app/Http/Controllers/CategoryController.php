@@ -24,7 +24,7 @@ class CategoryController extends Controller
         //validate input
         $request->validate([
             'title' => 'required|string|max:255',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
         ]);
         
         //handle logic and store into db
@@ -75,5 +75,17 @@ class CategoryController extends Controller
         $category = $this->category->find($id);
         $category->delete();
         return redirect()->route('category.index')->with('success','Category Deleted successfully');
+    }
+
+    public function download($id)
+    {
+        $category = $this->category->findOrFail($id);
+        $path = storage_path('app/public/' . $category->image);
+
+        if (!file_exists($path)) {
+            abort(404, 'Image not found');
+        }
+
+        return response()->download($path, basename($category->image));
     }
 }

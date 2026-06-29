@@ -7,8 +7,13 @@
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
+    # Route OPTIONS preflight requests to Laravel so CORS middleware runs
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule ^ index.php [L]
+
     # Send all requests to index.php (skip real files and directories)
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+

@@ -49,15 +49,20 @@
                         @foreach($categoryData as $data)
                         <tr>
                             <td>{{$data->title}}</td>
-                            <td><img src="{{ asset('storage/' .$data->image)}}" alt="{{$data->image}}" srcset="" width="70px"></td>
+                            <td>
+                                <a href="{{ asset('storage/' . $data->image) }}" target="_blank">
+                                    <img src="{{ asset('storage/' . $data->image) }}" alt="{{ $data->title }}" width="70px" style="border-radius:6px;">
+                                </a>
+                            </td>
                             <td>{{$data->ref}}</td>
                             <td>
                                 <a href="#category-form" class="btn icon btn-primary edit-category-btn" data-id="{{$data->id}}"><i data-feather="edit"></i></a>
-                                <form id="deleteForm" style="display: inline;" action="{{ route('category.destroy', $data->id) }}" method="POST">
+                                <a href="{{ route('category.download', $data->id) }}" class="btn icon btn-success" title="Download Image"><i data-feather="download"></i></a>
+                                <form style="display: inline;" action="{{ route('category.destroy', $data->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn icon btn-danger" onclick="return confirm('Are you sure you want to delete?')">
-                                        <i data-feather="delete"></i>
+                                        <i data-feather="trash-2"></i>
                                     </button>
                                 </form>
                             </td>

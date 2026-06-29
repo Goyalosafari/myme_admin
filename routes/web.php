@@ -69,6 +69,7 @@ Route::middleware(['admin.auth', 'web', 'prevent-back-history'])->group(function
     Route::get('/category/{id}/edit',[CategoryController::class, 'edit'])->name('category.edit');
     Route::put('/category/update/{id}',[CategoryController::class,'update'])->name('category.update');
     Route::delete('/category/delete/{id}',[CategoryController::class, 'destroy'])->name('category.destroy');
+    Route::get('/category/{id}/download',[CategoryController::class, 'download'])->name('category.download');
 
     Route::get('/food', [FoodController::class, 'index'])->name('food.index');
     Route::post('/food/post',[FoodController::class, 'store'])->name('food.store');
