@@ -50,8 +50,8 @@
                         <tr>
                             <td>{{$data->title}}</td>
                             <td>
-                                <a href="{{ asset('storage/' . $data->image) }}" target="_blank">
-                                    <img src="{{ asset('storage/' . $data->image) }}" alt="{{ $data->title }}" width="70px" style="border-radius:6px;">
+                                <a href="{{ asset('storage/app/public/' . $data->image) }}" target="_blank">
+                                    <img src="{{ asset('storage/app/public/' . $data->image) }}" alt="{{ $data->title }}" width="70px" style="border-radius:6px;">
                                 </a>
                             </td>
                             <td>{{$data->ref}}</td>

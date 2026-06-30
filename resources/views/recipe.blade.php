@@ -88,7 +88,7 @@
                                     {{$data->utensils}}
                                 </span>
                             </td>
-                            <td><img src="{{ asset('storage/' .$data->image)}}" alt="{{$data->image}}" srcset="" width="70px"></td>
+                            <td><img src="{{ asset('storage/app/public/' .$data->image)}}" alt="{{$data->image}}" srcset="" width="70px"></td>
                             <td>
                                 <a href="#recipe-form" class="btn icon btn-primary edit-recipe-btn" data-id="{{$data->id}}"><i data-feather="edit"></i></a>
                                 <form id="deleteForm" style="display: inline;" action="{{ route('recipe.destroy', $data->id) }}" method="POST">

@@ -1,0 +1,981 @@
+{
+  "info": {
+    "name": "Myme API",
+    "_postman_id": "myme-api-collection-v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://backoffice.mymee.in/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Send OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/send-otp", "host": ["{{base_url}}"], "path": ["send-otp"] },
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/verify-otp", "host": ["{{base_url}}"], "path": ["verify-otp"] },
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"\",\n  \"otp\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Send Register OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/send-register-otp", "host": ["{{base_url}}"], "path": ["send-register-otp"] },
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Verify Register OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/verify-register-otp", "host": ["{{base_url}}"], "path": ["verify-register-otp"] },
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"\",\n  \"otp\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/login", "host": ["{{base_url}}"], "path": ["login"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"\",\n  \"password\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/register", "host": ["{{base_url}}"], "path": ["register"] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"\",\n  \"email\": \"\",\n  \"phone\": \"\",\n  \"password\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/forgot-password", "host": ["{{base_url}}"], "path": ["forgot-password"] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/logout", "host": ["{{base_url}}"], "path": ["logout"] },
+            "body": { "mode": "raw", "raw": "{}", "options": { "raw": { "language": "json" } } }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Banner",
+      "item": [
+        {
+          "name": "Banner List",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/bannerList", "host": ["{{base_url}}"], "path": ["bannerList"] }
+          }
+        },
+        {
+          "name": "Banner Home",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/bannerHome", "host": ["{{base_url}}"], "path": ["bannerHome"] }
+          }
+        },
+        {
+          "name": "Home Category 1",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/homeCategory1", "host": ["{{base_url}}"], "path": ["homeCategory1"] }
+          }
+        },
+        {
+          "name": "Home Category 2",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/homeCategory2", "host": ["{{base_url}}"], "path": ["homeCategory2"] }
+          }
+        },
+        {
+          "name": "Home Ad 1",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/homeAd", "host": ["{{base_url}}"], "path": ["homeAd"] }
+          }
+        },
+        {
+          "name": "Home Ad 2",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/homeAd1", "host": ["{{base_url}}"], "path": ["homeAd1"] }
+          }
+        },
+        {
+          "name": "Banner Food 1",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/bannerFood1", "host": ["{{base_url}}"], "path": ["bannerFood1"] }
+          }
+        },
+        {
+          "name": "Banner Food 2",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/bannerFood2", "host": ["{{base_url}}"], "path": ["bannerFood2"] }
+          }
+        },
+        {
+          "name": "Banner Grocery 1",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/bannerGrocery1", "host": ["{{base_url}}"], "path": ["bannerGrocery1"] }
+          }
+        },
+        {
+          "name": "Banner Grocery 2",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/bannerGrocery2", "host": ["{{base_url}}"], "path": ["bannerGrocery2"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Category",
+      "item": [
+        {
+          "name": "Category List (by type)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/categoryList/food", "host": ["{{base_url}}"], "path": ["categoryList", "food"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Food",
+      "item": [
+        {
+          "name": "Food List (by type)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/foodList/food", "host": ["{{base_url}}"], "path": ["foodList", "food"] }
+          }
+        },
+        {
+          "name": "Food List By Category",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/foodListByCategory/1", "host": ["{{base_url}}"], "path": ["foodListByCategory", "1"] }
+          }
+        },
+        {
+          "name": "Food List By Category ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/foodListByCategoryId/1", "host": ["{{base_url}}"], "path": ["foodListByCategoryId", "1"] }
+          }
+        },
+        {
+          "name": "Food Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/food/1", "host": ["{{base_url}}"], "path": ["food", "1"] }
+          }
+        },
+        {
+          "name": "Offer Food 1",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/offerfood1", "host": ["{{base_url}}"], "path": ["offerfood1"] }
+          }
+        },
+        {
+          "name": "Offer Food 2",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/offerfood2", "host": ["{{base_url}}"], "path": ["offerfood2"] }
+          }
+        },
+        {
+          "name": "Offer Grocery 1",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/offergrocery1", "host": ["{{base_url}}"], "path": ["offergrocery1"] }
+          }
+        },
+        {
+          "name": "Offer Grocery 2",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/offergrocery2", "host": ["{{base_url}}"], "path": ["offergrocery2"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Recipe",
+      "item": [
+        {
+          "name": "Recipe List",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/recipeList", "host": ["{{base_url}}"], "path": ["recipeList"] }
+          }
+        },
+        {
+          "name": "Recipe List By Food",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/recipeList/1", "host": ["{{base_url}}"], "path": ["recipeList", "1"] }
+          }
+        },
+        {
+          "name": "Recipe Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/recipe/1", "host": ["{{base_url}}"], "path": ["recipe", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Coupon",
+      "item": [
+        {
+          "name": "Coupon List",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/coupenList", "host": ["{{base_url}}"], "path": ["coupenList"] }
+          }
+        },
+        {
+          "name": "Filter Coupon",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/coupenList", "host": ["{{base_url}}"], "path": ["coupenList"] },
+            "body": { "mode": "raw", "raw": "{\n  \"code\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Check Coupon",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/coupenCheck?code=",
+              "host": ["{{base_url}}"],
+              "path": ["coupenCheck"],
+              "query": [{ "key": "code", "value": "" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Timeslot",
+      "item": [
+        {
+          "name": "Get Timeslots",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/timeslots", "host": ["{{base_url}}"], "path": ["timeslots"] }
+          }
+        },
+        {
+          "name": "Timeslots By Date",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/timeslotsDate", "host": ["{{base_url}}"], "path": ["timeslotsDate"] },
+            "body": { "mode": "raw", "raw": "{\n  \"date\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Order",
+      "item": [
+        {
+          "name": "Add To Cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/addToCart", "host": ["{{base_url}}"], "path": ["addToCart"] },
+            "body": { "mode": "raw", "raw": "{\n  \"user_id\": \"\",\n  \"food_id\": \"\",\n  \"quantity\": 1\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Update Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/updateOrder", "host": ["{{base_url}}"], "path": ["updateOrder"] },
+            "body": { "mode": "raw", "raw": "{\n  \"order_id\": \"\",\n  \"quantity\": 1\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Orders By User ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ordersByUserId?user_id=",
+              "host": ["{{base_url}}"],
+              "path": ["ordersByUserId"],
+              "query": [{ "key": "user_id", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "User Cart Sum",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/usercartsum?user_id=",
+              "host": ["{{base_url}}"],
+              "path": ["usercartsum"],
+              "query": [{ "key": "user_id", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "Orders By Order ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ordersByOrderId?order_id=",
+              "host": ["{{base_url}}"],
+              "path": ["ordersByOrderId"],
+              "query": [{ "key": "order_id", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "Orders List By User ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ordersListByUserId?user_id=",
+              "host": ["{{base_url}}"],
+              "path": ["ordersListByUserId"],
+              "query": [{ "key": "user_id", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "Orders Group By User ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ordersGroupByUserId?user_id=",
+              "host": ["{{base_url}}"],
+              "path": ["ordersGroupByUserId"],
+              "query": [{ "key": "user_id", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "Cart Sum By User ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cartSumByUserId?user_id=",
+              "host": ["{{base_url}}"],
+              "path": ["cartSumByUserId"],
+              "query": [{ "key": "user_id", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "GST Sum By User ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/gstSumByUserId?user_id=",
+              "host": ["{{base_url}}"],
+              "path": ["gstSumByUserId"],
+              "query": [{ "key": "user_id", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "Orders History Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/OrdersHistoryDetails?user_id=",
+              "host": ["{{base_url}}"],
+              "path": ["OrdersHistoryDetails"],
+              "query": [{ "key": "user_id", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "Update Timeslot",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/updateTimeslot/1", "host": ["{{base_url}}"], "path": ["updateTimeslot", "1"] },
+            "body": { "mode": "raw", "raw": "{\n  \"timeslot_id\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Order Book",
+      "item": [
+        {
+          "name": "Create Order Book",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/createOrderBook", "host": ["{{base_url}}"], "path": ["createOrderBook"] },
+            "body": { "mode": "raw", "raw": "{\n  \"user_id\": \"\",\n  \"timeslot_id\": \"\",\n  \"payment_method\": \"\",\n  \"address\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Order Book List",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/orderBookList", "host": ["{{base_url}}"], "path": ["orderBookList"] },
+            "body": { "mode": "raw", "raw": "{\n  \"user_id\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Cancel Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/cancelOrder", "host": ["{{base_url}}"], "path": ["cancelOrder"] },
+            "body": { "mode": "raw", "raw": "{\n  \"order_book_id\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Order History",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/OrderHistory?user_id=",
+              "host": ["{{base_url}}"],
+              "path": ["OrderHistory"],
+              "query": [{ "key": "user_id", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "User Wallet",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/UserWallet?user_id=",
+              "host": ["{{base_url}}"],
+              "path": ["UserWallet"],
+              "query": [{ "key": "user_id", "value": "" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "User Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/Userprofile?user_id=",
+              "host": ["{{base_url}}"],
+              "path": ["Userprofile"],
+              "query": [{ "key": "user_id", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/update-profile", "host": ["{{base_url}}"], "path": ["update-profile"] },
+            "body": { "mode": "raw", "raw": "{\n  \"user_id\": \"\",\n  \"name\": \"\",\n  \"email\": \"\",\n  \"phone\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Apply Reward Points",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/apply-reward-points", "host": ["{{base_url}}"], "path": ["apply-reward-points"] },
+            "body": { "mode": "raw", "raw": "{\n  \"user_id\": \"\",\n  \"points\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Deactivate User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/deactivate-user", "host": ["{{base_url}}"], "path": ["deactivate-user"] },
+            "body": { "mode": "raw", "raw": "{\n  \"user_id\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/pass-user", "host": ["{{base_url}}"], "path": ["pass-user"] },
+            "body": { "mode": "raw", "raw": "{\n  \"user_id\": \"\",\n  \"password\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Profile (Sanctum)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/profile", "host": ["{{base_url}}"], "path": ["profile"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pincode",
+      "item": [
+        {
+          "name": "Pincode List",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/pincode", "host": ["{{base_url}}"], "path": ["pincode"] }
+          }
+        },
+        {
+          "name": "Pincode Validation",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/pincodeValidation", "host": ["{{base_url}}"], "path": ["pincodeValidation"] },
+            "body": { "mode": "raw", "raw": "{\n  \"pincode\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "All Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/notifications", "host": ["{{base_url}}"], "path": ["notifications"] }
+          }
+        },
+        {
+          "name": "Filter Notification",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/filterNotification?user_id=",
+              "host": ["{{base_url}}"],
+              "path": ["filterNotification"],
+              "query": [{ "key": "user_id", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "Filter Notification By Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/filterNotificationByOrder", "host": ["{{base_url}}"], "path": ["filterNotificationByOrder"] },
+            "body": { "mode": "raw", "raw": "{\n  \"order_id\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ratings",
+      "item": [
+        {
+          "name": "Submit Rating",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/ratings", "host": ["{{base_url}}"], "path": ["ratings"] },
+            "body": { "mode": "raw", "raw": "{\n  \"user_id\": \"\",\n  \"food_id\": \"\",\n  \"rating\": 5,\n  \"review\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Favorites (Sanctum)",
+      "item": [
+        {
+          "name": "Add To Favorites",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/addTofavorites", "host": ["{{base_url}}"], "path": ["addTofavorites"] },
+            "body": { "mode": "raw", "raw": "{\n  \"food_id\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Favorites List",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/favoritesList", "host": ["{{base_url}}"], "path": ["favoritesList"] }
+          }
+        },
+        {
+          "name": "Remove Favorite",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/favorites/1", "host": ["{{base_url}}"], "path": ["favorites", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payment",
+      "item": [
+        {
+          "name": "Razorpay Payment Page",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/razorpay-payment", "host": ["{{base_url}}"], "path": ["razorpay-payment"] }
+          }
+        },
+        {
+          "name": "Razorpay Payment Store",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/razorpay-payment", "host": ["{{base_url}}"], "path": ["razorpay-payment"] },
+            "body": { "mode": "raw", "raw": "{\n  \"razorpay_payment_id\": \"\",\n  \"amount\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test SMS",
+      "item": [
+        {
+          "name": "Test SMS",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/test-sms", "host": ["{{base_url}}"], "path": ["test-sms"] },
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Order SMS",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/order-sms", "host": ["{{base_url}}"], "path": ["order-sms"] },
+            "body": { "mode": "raw", "raw": "{\n  \"order_id\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Cancel SMS",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/cancel-sms", "host": ["{{base_url}}"], "path": ["cancel-sms"] },
+            "body": { "mode": "raw", "raw": "{\n  \"order_id\": \"\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        }
+      ]
+    }
+  ]
+}
