@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Support\Facades\Auth;
@@ -66,7 +67,7 @@ class RegisterApiController extends Controller
 
         return response([
             'token'   => $token,
-            'user'    => $user,
+            'user'    => new UserResource($user),
             'wallet'  => $wallet,
             'message' => 'User registered successfully',
         ], 201);

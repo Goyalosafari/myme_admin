@@ -2,315 +2,177 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Food;
-use App\Models\Order;
-use App\Models\Notification;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\OrderResource;
+use App\Models\Food;
+use App\Models\Notification;
+use App\Models\Order;
+use App\Traits\ApiResponse;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Illuminare\Support\Carbon\Carbon;
 
 class OrderApiController extends Controller
 {
-    protected $order;
-
-    public function __construct(Order $order)
-    {
-        $this->order = $order;
-    }
+    use ApiResponse;
 
     public function addToCart(Request $request)
     {
-       
-        // Ensure that the request data is an array
-        $requestData = $request->all();
+        $validator = Validator::make($request->all(), [
+            'food_id' => 'required|exists:foods,id',
+            'user_id' => 'required',
+            'qty'     => 'nullable|integer|min:1',
+        ]);
 
-        if (!is_array($requestData)) {
-           return response(['error' => 'Invalid request data'], 400);
+        if ($validator->fails()) {
+            return $this->error('Validation failed', 422, $validator->errors());
         }
-       
-       // $requestData['dt_from'] = $requestData['dt_from'] ? \DateTime::createFromFormat('d/m/Y',$requestData['dt_from'])->format('Y-m-d') : (new \DateTime())->format('Y-m-d');
-       // $requestData['dt_to'] = $requestData['dt_to'] ? \DateTime::createFromFormat('d/m/Y',$requestData['dt_to'])->format('Y-m-d') : (new \DateTime())->format('Y-m-d');
 
-        // Set default values if they are not provided
-        $requestData['user_id'] = $requestData['user_id'];
-        $requestData['qty'] = $requestData['qty'] ?? 1;
-        $requestData['discount'] = $requestData['discount'] ?? 0.00;
-        $requestData['finyear'] = $requestData['finyear'] ?? "2023-24";
-
-        // Retrieve food data and calculate total price
-        $foodData = Food::find($requestData['food_id']);
-        $requestData['price'] = $foodData->offer_price;
-        $requestData['total'] = $requestData['qty'] * $requestData['price'];
-        $requestData['date'] = (new \DateTime())->format('Y-m-d');
-        $requestData['status'] = 'cart';
-        $requestData['invoice_id'] = 1;
-        $requestData['cess'] = 0.00;
-
-        // Validate the incoming request data
-        $validator = Validator::make($requestData, [
-           'food_id' => 'required',
-           'qty' => 'integer',
-       ]);
-
-       // Check if validation fails
-       if ($validator->fails()) {
-           return response(['error' => $validator->errors()], 400);
-       }
-       
-            // Check if the food with the given food_id is already in the cart for the current user
-        $existingOrder = Order::where([
-            'food_id' => $requestData['food_id'],
-            'user_id' => $requestData['user_id'],
-            'status' => 'cart',
+        $existing = Order::where([
+            'food_id' => $request->food_id,
+            'user_id' => $request->user_id,
+            'status'  => 'cart',
         ])->first();
 
-        if ($existingOrder) {
-            return response(['error' => 'This food item is already in the cart'], 400);
+        if ($existing) {
+            return $this->error('This item is already in the cart', 409);
         }
 
+        $food = Food::findOrFail($request->food_id);
+        $qty  = $request->qty ?? 1;
 
- // Create a new order using the validated data
-       $order = Order::create($requestData);
-       $data = Order::find($order->id);
+        $order = Order::create([
+            'food_id'    => $request->food_id,
+            'user_id'    => $request->user_id,
+            'qty'        => $qty,
+            'price'      => $food->offer_price,
+            'total'      => $qty * $food->offer_price,
+            'discount'   => $request->discount ?? 0.00,
+            'finyear'    => $request->finyear ?? '2023-24',
+            'date'       => Carbon::today()->toDateString(),
+            'status'     => 'cart',
+            'invoice_id' => 1,
+            'cess'       => 0.00,
+        ]);
 
-       $notification = Notification::create([
-        'food_id' => $requestData['food_id'],
-        'order_id' => $order->id,
-        'message' => 'Product Added to cart',
-        'general' => 'no',
-        'status' => 'no'
-       ]);
-       return response(['message' => 'Order created successfully', 'order' => $data], 201);
+        Notification::create([
+            'food_id'  => $request->food_id,
+            'order_id' => $order->id,
+            'message'  => 'Product Added to cart',
+            'general'  => 'no',
+            'status'   => 'no',
+        ]);
+
+        return $this->success(new OrderResource($order), 'Order created successfully', 201);
     }
-    
-  /*  public function ordersByUserId(Request $request)
+
+    public function updateOrder(Request $request)
     {
-        $orders = Order::with('food')->where('user_id', $request->user_id)
-        ->where('status','cart')->get();
+        $order = Order::find($request->order_id);
 
-        $order_sum = Order::where('user_id', $request->user_id)
-        ->where('status','cart')->sum('total');
-        
-        $gst_sum = Order::where('user_id', $request->user_id)
-        ->where('status','cart')->sum('gst_value');
+        if (!$order || $order->status !== 'cart' || $order->user_id != $request->user_id) {
+            return $this->success(['status' => 'not_existing']);
+        }
 
-        return response()->json(['orders' => $orders, 'order_sum'=>$order_sum, 'gst_sum'=>$gst_sum], 200);
-    }*/
-    
+        if ($request->qty == 0) {
+            $order->delete();
+            return $this->success(['status' => 'deleted']);
+        }
+
+        $order->update([
+            'qty'   => $request->qty,
+            'total' => $order->price * $request->qty,
+        ]);
+
+        return $this->success(['status' => 'updated']);
+    }
+
+    public function ordersByUserId(Request $request)
+    {
+        return $this->success(
+            OrderResource::collection(
+                Order::with('food')->where('user_id', $request->user_id)->where('status', 'cart')->get()
+            )
+        );
+    }
+
+    public function userCartSum(Request $request)
+    {
+        $total = Order::where('user_id', $request->user_id)->where('status', 'cart')->sum('total');
+
+        return $this->success(['totalSum' => $total]);
+    }
+
     public function cartSumByUserId(Request $request)
     {
+        $sum = Order::where('user_id', $request->user_id)->where('status', 'cart')->sum('total');
 
-        $order_sum = Order::where('user_id', $request->user_id)
-        ->where('status','cart')->sum('total');
-        
-        return response()->json(['order_sum'=>$order_sum], 200);
-    }
-    
-       public function gstSumByUserId(Request $request)
-    {
-
-        $gst_sum = Order::where('user_id', $request->user_id)
-        ->where('status','cart')->sum('gst_value');
-
-        return response()->json(['gst_sum'=>$gst_sum], 200);
+        return $this->success(['order_sum' => $sum]);
     }
 
-    public function ordersByUserId(Request $request)
+    public function gstSumByUserId(Request $request)
     {
-        
-        $orders = Order::with('food')->where('user_id', $request->user_id)
-        ->where('status','cart')->get();
-        return response()->json(['orders' => $orders], 200);
+        $sum = Order::where('user_id', $request->user_id)->where('status', 'cart')->sum('gst_value');
+
+        return $this->success(['gst_sum' => $sum]);
     }
-    
-        public function userCartSum(Request $request)
+
+    public function ordersByOrderId(Request $request)
     {
-        
-        $orders = Order::with('food')->where('user_id', $request->user_id)
-        ->where('status','cart')->get();
-        $totalSum = $orders->sum('total');
-        return response()->json(['totalSum' => $totalSum], 200);
+        return $this->success(
+            OrderResource::collection(
+                Order::with('food')->where('order_book_id', $request->order_book_id)->where('status', 'order')->get()
+            )
+        );
     }
-    
-        public function ordersByOrderId(Request $request)
+
+    public function ordersByListUserId(Request $request)
     {
-        
-        $orders = Order::with('food')->where('order_book_id', $request->user_id)
-        ->where('status','order')->get();
-        return response()->json(['orders' => $orders], 200);
+        return $this->success(
+            OrderResource::collection(
+                Order::with('food')->where('user_id', $request->user_id)->where('status', 'order')->get()
+            )
+        );
     }
-    
-    ///ordersByListUserId
-    
-        public function ordersByListUserId(Request $request)
-   {
-         $orders = Order::with('food')->where('user_id', $request->user_id)
-        ->where('status','order')->get();
-        return response()->json(['orders' => $orders], 200);
-    }
-    
+
     public function ordersHistoryDetails(Request $request)
-   {
-         $orders = Order::with('food')->where('user_id', $request->user_id)
-         ->where('order_book_id', $request->order_id)
-        ->where('status','order')->get();
-        return response()->json(['orders' => $orders], 200);
-    }
-    
-      /*  {
-         $orders = Order::with('food','time_slot')->where('user_id', $request->user_id)
-        ->where('status','order')->get()
-        ->groupBy('order_book_id');
-        return response()->json(['orders' => $orders], 200);
-    }
-    
-    public function ordersByUserId(Request $request)
     {
-        
-        $orders = Order::with('food', ‘time_slot’ )->where('user_id', $request->user_id)
-        ->where('status','cart')->get();
-        return response()->json(['orders' => $orders], 200);
+        return $this->success(
+            OrderResource::collection(
+                Order::with('food')
+                    ->where('user_id', $request->user_id)
+                    ->where('order_book_id', $request->order_id)
+                    ->where('status', 'order')
+                    ->get()
+            )
+        );
     }
-    
-    
-    
-    */
-    
-    public function time_slot()
-    {
-        return $this->belongsTo(TimeSlot::class, 'id');
-    }
-    
-    public function updateTimeslot(Request $request, $orderId)
-    {
-        $data = Order::where('id', $orderId)
-        ->update([
-            'time_slot' => $request->time_slot
-        ]);
-        return response()->json('success', 200);
-    }
-    
-    
+
     public function ordersByGroupUserId(Request $request)
- 
-        {
-         $orders = Order::with('food','time_slot')->where('user_id', $request->user_id)
-        ->where('status','order')->get()
-        ->groupBy('order_book_id');
-        return response()->json(['orders' => $orders], 200);
-    }
-
-
-public function updateOrder(Request $request)
     {
-        $order = Order::find($request->order_id);
-        if($order->status == 'cart' && $order->user_id ==  $request->user_id)
-        {
-            if($request->qty == 0){
-                $order->delete();
-                $status = 'deleted';
-                // $notification = Notification::create([
-                //     'food_id' => $order->food_id,
-                //     'order_id' => $request->order_id,
-                //     'message' => 'Product Removed from cart',
-                //     'general' => 'no',
-                //     'status' => 'no'
-                // ]);
-            }else{
-                $order->update([
-                    'qty' =>$request->qty,
-                    'total' => $order->price * $request->qty
-                ]);                $status = 'updated';
-                /*$notification = Notification::create([
-                    'food_id' => $order->food_id,
-                    'order_id' => $request->order_id,
-                    'message' => 'Product modified to cart',
-                    'general' => 'no',
-                    'status' => 'no'
-                ]);*/
-            }
-        }else{
-            $status = 'not_existing';
-        }
-        return response()->json(['status'=>$status]);
-        
+        $orders = Order::with('food')
+            ->where('user_id', $request->user_id)
+            ->where('status', 'order')
+            ->get()
+            ->groupBy('order_book_id')
+            ->map(fn($group) => OrderResource::collection($group)->resolve());
+
+        return $this->success($orders);
     }
 
- public function updateOrder123(Request $request)
+    public function ordersByTimeslot(Request $request)
     {
-        $order = Order::find($request->order_id);
-        if($order->status == 'cart' && $order->user_id ==  $request->user_id)
-        {
-            if($request->qty == 0){
-                $order->delete();
-                $status = 'deleted';
-                // $notification = Notification::create([
-                //     'food_id' => $order->food_id,
-                //     'order_id' => $request->order_id,
-                //     'message' => 'Product Removed from cart',
-                //     'general' => 'no',
-                //     'status' => 'no'
-                // ]);
-            }else{
-                $order->update(['qty' =>$request->qty]);
-                $status = 'updated';
-                /*$notification = Notification::create([
-                    'food_id' => $order->food_id,
-                    'order_id' => $request->order_id,
-                    'message' => 'Product modified to cart',
-                    'general' => 'no',
-                    'status' => 'no'
-                ]);*/
-            }
-        }else{
-            $status = 'not_existing';
-        }
-        return response()->json(['status'=>$status]);
+        return $this->success(
+            OrderResource::collection(
+                Order::with('food')->where('user_id', $request->user_id)->where('status', 'cart')->get()
+            )
+        );
     }
-    
-    
-    
-       public function ordersByTimeslot(Request $request)
+
+    public function updateTimeSlot(Request $request, $orderId)
     {
-        
-        $orders = Order::with('food', ‘time_slot’ )->where('user_id', $request->user_id)
-        ->where('status','cart')->get();
-        return response()->json(['orders' => $orders], 200);
+        Order::where('id', $orderId)->update(['time_slot' => $request->time_slot]);
+
+        return $this->success(null, 'Timeslot updated');
     }
-
-public function testSmsSending()
-{
-    // Static test values
-    $userData = (object)[
-        'mobile' => '7559899911' // Replace with a test mobile number
-    ];
-
-    $orderBook = (object)[
-        'id' => 101,              // Replace with a test order ID
-        'ref1' => '3-5 days',     // Replace with estimated delivery time
-        'del_dt' => '2024-11-20'  // Replace with a test delivery date
-    ];
-
-    $mobileNumber = $userData->mobile;
-    $message = "Thank you for your order with MYME BUSINESS CORPORATION PRIVATE LIMITED ! Your order #{$orderBook->id} has been successfully placed. You will receive a confirmation email shortly. Estimated delivery time: {$orderBook->ref1} and date : {$orderBook->del_dt}.";
-    $templateID = '1207171377328523771';
-
-    try {
-        // Assuming $this->smsService->sendSms() is implemented
-        $response = $this->smsService->sendSms($mobileNumber, $message, $templateID);
-
-        // Log or display the response for verification
-        \Log::info('SMS Response: ' . json_encode($response));
-        echo "SMS sent successfully! Response: " . json_encode($response);
-    } catch (\Exception $e) {
-        // Log the error for debugging
-        \Log::error('SMS sending failed: ' . $e->getMessage());
-        echo "SMS sending failed: " . $e->getMessage();
-    }
-}
-
-    
-    
 }

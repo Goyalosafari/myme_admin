@@ -3,66 +3,79 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\BannerResource;
 use App\Models\Banner;
-
-use Illuminate\Http\Request;
+use App\Traits\ApiResponse;
 
 class BannerApiController extends Controller
 {
+    use ApiResponse;
+
     public function index()
     {
-        $banner = Banner::all();
-        return response()->json( ['banner'=>$banner],200 );
+        return $this->success(BannerResource::collection(Banner::all()));
     }
-    
+
     public function Banner()
     {
-        $banner = Banner::where('display_location','home')->orderBy('id', 'desc')->take(6)->get();
-        return response()->json( ['banner'=>$banner],200 );
-        
+        return $this->success(
+            BannerResource::collection(
+                Banner::where('display_location', 'home')->latest()->take(6)->get()
+            )
+        );
     }
-    
-        public function CategoryOne()
+
+    public function CategoryOne()
     {
-        $banner = Banner::where('display_location','page_1')->orderBy('id', 'desc')->get();
-        return response()->json( ['banner'=>$banner],200 );
-        
+        return $this->success(
+            BannerResource::collection(
+                Banner::where('display_location', 'page_1')->latest()->get()
+            )
+        );
     }
-    
-        public function CategoryTwo()
+
+    public function CategoryTwo()
     {
-        $banner = Banner::where('display_location','page_2')->orderBy('id', 'desc')->get();
-        return response()->json( ['banner'=>$banner],200 );
+        return $this->success(
+            BannerResource::collection(
+                Banner::where('display_location', 'page_2')->latest()->get()
+            )
+        );
     }
-    
- 
-    
-            public function AdOne()
+
+    public function AdOne()
     {
-        $banner = Banner::where('display_location','ad_1')->orderBy('id', 'desc')->get();
-        return response()->json( ['banner'=>$banner],200 );
+        return $this->success(
+            BannerResource::collection(
+                Banner::where('display_location', 'ad_1')->latest()->get()
+            )
+        );
     }
-    
-                public function AdTwo()
+
+    public function AdTwo()
     {
-        $banner = Banner::where('display_location','ad_2')->orderBy('id', 'desc')->get();
-        return response()->json( ['banner'=>$banner],200 );
+        return $this->success(
+            BannerResource::collection(
+                Banner::where('display_location', 'ad_2')->latest()->get()
+            )
+        );
     }
-    
-                public function AdThree()
+
+    public function AdThree()
     {
-        $banner = Banner::where('display_location','ad_3')->orderBy('id', 'desc')->get();
-        return response()->json( ['banner'=>$banner],200 );
+        return $this->success(
+            BannerResource::collection(
+                Banner::where('display_location', 'ad_3')->latest()->get()
+            )
+        );
     }
-    
-                public function AdFour()
+
+    public function AdFour()
     {
-        $banner = Banner::where('display_location','ad_4')->orderBy('id', 'desc')->get();
-        return response()->json( ['banner'=>$banner],200 );
+        return $this->success(
+            BannerResource::collection(
+                Banner::where('display_location', 'ad_4')->latest()->get()
+            )
+        );
     }
-    
 }
-
-
-
-    

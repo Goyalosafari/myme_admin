@@ -3,63 +3,78 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\FoodResource;
 use App\Models\Category;
 use App\Models\Food;
-use Illuminate\Http\Request;
+use App\Traits\ApiResponse;
 
 class FoodApiController extends Controller
 {
+    use ApiResponse;
+
     public function index($type)
     {
-        if($type == 'food'){
-        $foods = Food::with('category')->where('type', 'food')->get();
-        }else if($type == 'grocery'){
-            $foods = Food::with('category')->where('type', 'grocery')->get(); 
+        if (!in_array($type, ['food', 'grocery'])) {
+            return $this->error('Invalid food type', 422);
         }
-        return response()->json(['foods'=>$foods], 200);
+
+        return $this->success(
+            FoodResource::collection(Food::with('category')->where('type', $type)->get())
+        );
     }
 
     public function foodByCategory($category_id)
     {
-        $foods = Food::where('category_id', $category_id)->get();
-        return response()->json(['foods'=>$foods], 200);
+        return $this->success(
+            FoodResource::collection(Food::where('category_id', $category_id)->get())
+        );
     }
 
     public function foodByCategoryId($category_id)
     {
-        $category = Category::findOrFail($category_id); 
-        $foods = $category->foods;
-       // return response()->json($foods, 200);
-        return response()->json(['foods'=>$foods], 200);
+        $category = Category::findOrFail($category_id);
+
+        return $this->success(FoodResource::collection($category->foods));
     }
-    
+
     public function foodDetails(Food $food)
     {
-        $details = $food->load('category');
-        return response()->json(['details'=>$details], 200);
+        return $this->success(new FoodResource($food->load('category')));
     }
-    
+
     public function Homefood1()
     {
-        $foods = Food::with('category')->where('type', 'food')->where('offer', 'yes')->get();
-        return response()->json(['foods'=>$foods], 200);
+        return $this->success(
+            FoodResource::collection(
+                Food::with('category')->where('type', 'food')->where('offer', 'yes')->get()
+            )
+        );
     }
-    
+
     public function Homefood2()
     {
-        $foods = Food::with('category')->where('type', 'food')->where('ref', 'yes')->get();
-        return response()->json(['foods'=>$foods], 200);
+        return $this->success(
+            FoodResource::collection(
+                Food::with('category')->where('type', 'food')->where('ref', 'yes')->get()
+            )
+        );
     }
+
     public function Homefood3()
     {
-        $foods = Food::with('category')->where('type', 'grocery')->where('offer', 'yes')->get();
-        return response()->json(['foods'=>$foods], 200);
+        return $this->success(
+            FoodResource::collection(
+                Food::with('category')->where('type', 'grocery')->where('offer', 'yes')->get()
+            )
+        );
     }
+
     public function Homefood4()
     {
-        $foods = Food::with('category')->where('type', 'grocery')->where('ref', 'yes')->get();
-        return response()->json(['foods'=>$foods], 200);
+        return $this->success(
+            FoodResource::collection(
+                Food::with('category')->where('type', 'grocery')->where('ref', 'yes')->get()
+            )
+        );
     }
 }
-
-//['foods'=>$foods]

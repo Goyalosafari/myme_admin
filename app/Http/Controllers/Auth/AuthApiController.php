@@ -1,9 +1,11 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
+
+use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Models\Wallet;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -36,7 +38,7 @@ class AuthApiController extends Controller
 
         return response([
             'token'   => $token,
-            'user'    => Auth::user(),
+            'user'    => new UserResource(Auth::user()),
             'wallet'  => $wallet,
             'message' => 'Login Successful',
         ]);
