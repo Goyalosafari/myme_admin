@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 namespace App\Http\Resources;
 
@@ -12,7 +12,7 @@ class CategoryResource extends JsonResource
         return [
             'id'    => $this->id,
             'title' => $this->title,
-            'image' => $this->image,
+            'image'            => 'storage/app/public/' . $this->image,
             'type'  => $this->type,
             'ref'   => $this->ref,
         ];

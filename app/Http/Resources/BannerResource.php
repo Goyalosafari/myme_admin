@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 namespace App\Http\Resources;
 
@@ -12,7 +12,7 @@ class BannerResource extends JsonResource
         return [
             'id'               => $this->id,
             'title'            => $this->title,
-            'image'            => $this->image,
+            'image'            => 'storage/app/public/' . $this->image,
             'display_location' => $this->display_location,
             'category'         => new CategoryResource($this->whenLoaded('category')),
         ];

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 namespace App\Http\Resources;
 
@@ -14,7 +14,7 @@ class FoodResource extends JsonResource
             'name'        => $this->name,
             'price'       => $this->price,
             'offer_price' => $this->offer_price,
-            'image'       => $this->image,
+            'image'            => 'storage/app/public/' . $this->image,
             'type'        => $this->type,
             'category_id' => $this->category_id,
             'offer'       => $this->offer,

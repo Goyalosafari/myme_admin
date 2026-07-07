@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 namespace App\Http\Resources;
 
@@ -13,7 +13,7 @@ class RecipeResource extends JsonResource
             'id'      => $this->id,
             'food_id' => $this->food_id,
             'title'   => $this->title,
-            'image'   => $this->image,
+            'image'            => 'storage/app/public/' . $this->image,
             'food'    => new FoodResource($this->whenLoaded('food')),
         ];
     }
