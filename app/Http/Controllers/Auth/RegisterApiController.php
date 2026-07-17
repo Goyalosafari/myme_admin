@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class RegisterApiController extends Controller
 {
@@ -34,16 +35,24 @@ class RegisterApiController extends Controller
                 'password' => Hash::make(Str::random(32)),
             ]);
         } else {
-            // Standard email + password registration
+            // Email + OTP + password registration
             $validator = Validator::make($request->all(), [
                 'name'     => ['required', 'string', 'max:255'],
                 'email'    => ['required', 'string', 'email', 'max:255', 'unique:users'],
                 'password' => ['required', 'string', 'min:8'],
+                'otp'      => ['required', 'digits:4'],
             ]);
 
             if ($validator->fails()) {
                 return response(['error' => $validator->errors()->all()], 422);
             }
+
+            // Verify email OTP set by /send-otp
+            $cached = Cache::get('email_otp_' . $request->email);
+            if (!$cached || $cached !== $request->otp) {
+                return response(['error' => ['Invalid or expired OTP']], 422);
+            }
+            Cache::forget('email_otp_' . $request->email);
 
             $user = User::create([
                 'name'      => $request->name,

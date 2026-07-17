@@ -25,29 +25,28 @@ class OtpApiController extends Controller
     {
         // Email-based OTP (registration flow)
         if ($request->filled('email')) {
-            $request->validate([
-                'email' => 'required|email',
-                'otp'   => 'required|digits:4',
-            ]);
+            $request->validate(['email' => 'required|email']);
 
             if (User::where('email', $request->email)->exists()) {
                 return response(['message' => 'Email already registered. Please login.'], 409);
             }
 
+            $otp = (string) rand(1000, 9999);
+            Cache::put('email_otp_' . $request->email, $otp, 1200); // 20 minutes
+
             try {
                 Mail::raw(
-                    "Your MYME registration OTP is: {$request->otp}\n\nValid for 20 minutes.",
+                    "Your MYME registration OTP is: {$otp}\n\nValid for 20 minutes.",
                     function ($msg) use ($request) {
                         $msg->to($request->email)
                             ->subject('MYME – Email Verification OTP');
                     }
                 );
             } catch (\Exception $e) {
-                // If mail is not configured, still return 200 so the OTP dialog shows
-                // Remove this catch block once mail is configured in .env
+                // Mail not configured — OTP still cached, dev can retrieve from cache
             }
 
-            return response(['message' => 'OTP sent successfully'], 200);
+            return response(['message' => 'OTP sent to ' . $request->email], 200);
         }
 
         // Mobile/SMS-based OTP (phone verification flow)
