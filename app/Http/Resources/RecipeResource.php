@@ -13,7 +13,7 @@ class RecipeResource extends JsonResource
             'id'      => $this->id,
             'food_id' => $this->food_id,
             'title'   => $this->title,
-            'image'            => 'storage/app/public/' . $this->image,
+            'image'            => 'storage/' . $this->image,
             'food'    => new FoodResource($this->whenLoaded('food')),
         ];
     }

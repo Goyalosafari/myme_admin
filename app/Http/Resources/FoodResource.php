@@ -14,7 +14,7 @@ class FoodResource extends JsonResource
             'name'        => $this->name,
             'price'       => $this->price,
             'offer_price' => $this->offer_price,
-            'image'            => 'storage/app/public/' . $this->image,
+            'image'            => 'storage/' . $this->image,
             'type'        => $this->type,
             'category_id' => $this->category_id,
             'offer'       => $this->offer,

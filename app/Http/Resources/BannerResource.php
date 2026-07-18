@@ -12,7 +12,7 @@ class BannerResource extends JsonResource
         return [
             'id'               => $this->id,
             'title'            => $this->title,
-            'image'            => 'storage/app/public/' . $this->image,
+            'image'            => 'storage/' . $this->image,
             'display_location' => $this->display_location,
             'category'         => new CategoryResource($this->whenLoaded('category')),
         ];
