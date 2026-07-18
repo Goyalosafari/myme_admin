@@ -99,7 +99,7 @@
                             <td>{{ implode(', ', $data->categories->pluck('title')->toArray()) }}</td>
                             <td>{{$data->offer}}</td>
                             <td>{{$data->gst}}</td>
-                            <td><img src="{{ asset('storage/app/public/' .$data->image)}}" alt="{{$data->image}}" srcset="" width="70px"></td>
+                            <td><img src="{{ asset('storage/' .$data->image)}}" alt="{{$data->image}}" srcset="" width="70px"></td>
                             <td>
                                 <a href="#food-form" class="btn icon btn-primary edit-food-btn" data-id="{{$data->id}}"><i data-feather="edit"></i></a>
                                 <form id="deleteForm" style="display: inline;" action="{{ url('/food/delete/'. $data->id) }}" method="POST">
@@ -326,7 +326,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6 col-12">
-                                        <label for=â€œvegâ€>Veg</label>
+                                        <label for=Ã¢â‚¬Å“vegÃ¢â‚¬Â>Veg</label>
                                         <select name="veg" id="veg" class="form-control" >
                                             <option value="">Select</option>
                                             <option value="yes">Yes</option>

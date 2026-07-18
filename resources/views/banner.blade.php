@@ -62,7 +62,7 @@
                             @endphp
                             {{ $options[$data->display_location] ?? '' }}
                             </td>
-                            <td><img src="{{ asset('storage/app/public/' .$data->image)}}" alt="{{$data->image}}" srcset="" width="70px"></td>
+                            <td><img src="{{ asset('storage/' .$data->image)}}" alt="{{$data->image}}" srcset="" width="70px"></td>
                             <td>{{($data->category != null ? $data->category->title : '')}}</td>
                             <td>
                                 <a class="btn icon btn-primary edit-banner-btn" data-id="{{$data->id}}"><i data-feather="edit"></i></a>

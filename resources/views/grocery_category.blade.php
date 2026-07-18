@@ -50,7 +50,7 @@
                         @foreach($categoryData as $data)
                         <tr>
                             <td>{{$data->title}}</td>
-                            <td><img src="{{ asset('storage/app/public/' .$data->image)}}" alt="{{$data->image}}" srcset="" width="70px"></td>
+                            <td><img src="{{ asset('storage/' .$data->image)}}" alt="{{$data->image}}" srcset="" width="70px"></td>
                             <td>{{$data->company}}</td>
                             <td>{{$data->ref}}</td>
                             <td>
