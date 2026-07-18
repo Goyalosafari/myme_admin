@@ -25,8 +25,8 @@ class LoginController extends Controller
             'password' => 'required',
         ]);
 
-        $adminEmail    = env('ADMIN_EMAIL');
-        $adminPassword = env('ADMIN_PASSWORD');
+        $adminEmail    = config('admin.email');
+        $adminPassword = config('admin.password');
 
         $emailMatch    = $request->email === $adminEmail;
         $passwordMatch = Hash::check($request->password, $adminPassword)
