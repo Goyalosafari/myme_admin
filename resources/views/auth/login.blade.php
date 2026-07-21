@@ -58,10 +58,15 @@
                                                class="form-control {{ $errors->has('credentials') ? 'is-invalid' : '' }}"
                                                id="password" name="password"
                                                placeholder="Enter your password"
-                                               autocomplete="current-password">
+                                               autocomplete="current-password"
+                                               style="padding-right: 2.8rem;">
                                         <div class="form-control-icon">
                                             <i data-feather="lock"></i>
                                         </div>
+                                        <span id="togglePassword"
+                                              style="position:absolute;top:50%;right:0.75rem;transform:translateY(-50%);cursor:pointer;color:#6c757d;line-height:1;">
+                                            <i data-feather="eye" id="eyeIcon"></i>
+                                        </span>
                                     </div>
                                 </div>
 
@@ -78,7 +83,21 @@
     <script src="{{asset('js/feather-icons/feather.min.js')}}"></script>
     <script src="{{asset('js/app.js')}}"></script>
     <script src="{{asset('js/main.js')}}"></script>
-    <script>feather.replace();</script>
+    <script>
+        feather.replace();
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            var input = document.getElementById('password');
+            var icon  = document.getElementById('eyeIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.setAttribute('data-feather', 'eye-off');
+            } else {
+                input.type = 'password';
+                icon.setAttribute('data-feather', 'eye');
+            }
+            feather.replace();
+        });
+    </script>
 </body>
 
 </html>
