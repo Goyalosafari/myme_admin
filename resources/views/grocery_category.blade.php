@@ -67,6 +67,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                <div class="mt-3">{{ $categoryData->links() }}</div>
             </div>
         </div>
     </section>

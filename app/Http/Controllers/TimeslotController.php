@@ -15,7 +15,7 @@ class TimeslotController extends Controller
 
     public function index()
     {
-        $datas = $this->time_slot->all();
+        $datas = $this->time_slot->latest()->paginate(20);
         return view('time_slot',compact('datas'));
     }
     public function store(Request $request)

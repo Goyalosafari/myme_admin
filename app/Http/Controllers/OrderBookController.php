@@ -12,7 +12,7 @@ class OrderBookController extends Controller
 {
     public function index()
     {
-        $orderBook = OrderBook::orderByDesc('id')->get();
+        $orderBook = OrderBook::orderByDesc('id')->paginate(20);
         $timeSlots = TimeSlot::all();
         return view('orderbook',compact('orderBook', 'timeSlots'));
     }

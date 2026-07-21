@@ -18,7 +18,7 @@ class RecipeController extends Controller
 
     public function index()
     {
-        $recipeData = $this->recipe->all();
+        $recipeData = $this->recipe->latest()->paginate(20);
         $categories = Category::where('type', 'food')->get();
         $foods = Food::where('type', 'food')->get();
         return view('recipe',compact('recipeData','categories','foods'));

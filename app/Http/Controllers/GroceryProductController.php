@@ -16,7 +16,7 @@ class GroceryProductController extends Controller
 
     public function index()
     {
-        $groceryData = $this->food->where('type', 'grocery')->get();
+        $groceryData = $this->food->where('type', 'grocery')->latest()->paginate(20);
         $categories = Category::where('type', 'grocery')->get();
         return view('grocery_product',compact('groceryData','categories'));
     }

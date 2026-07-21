@@ -16,7 +16,7 @@ class CoupenController extends Controller
 
     public function index()
     {
-        $coupenData = $this->coupen->all();
+        $coupenData = $this->coupen->latest()->paginate(20);
         return view('coupen',compact('coupenData'));
     }
     public function store(Request $request)

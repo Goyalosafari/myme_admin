@@ -18,15 +18,17 @@ class BannerController extends Controller
 
     public function index()
     {
-        $bannerData = $this->banner->all();
+        $bannerData = $this->banner->latest()->paginate(20);
         $categories = $this->category->all();
         return view('banner',compact('bannerData', 'categories'));
     }
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'title'            => 'required|string|max:255',
+            'image'            => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+            'display_location' => 'required|in:home,ad_1,ad_2,ad_3,ad_4',
+            'category_id'      => 'nullable|exists:categories,id',
         ]);
         
         $banner = new Banner();
@@ -53,8 +55,10 @@ class BannerController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
-            'company' => 'nullable|string|max:255'
+            'title'            => 'required|string|max:255',
+            'image'            => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+            'display_location' => 'required|in:home,ad_1,ad_2,ad_3,ad_4',
+            'category_id'      => 'nullable|exists:categories,id',
         ]);
         $banner = $this->banner->find($id);
         $banner->title = $request->input('title');

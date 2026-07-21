@@ -54,6 +54,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                <div class="mt-3">{{ $userData->links() }}</div>
             </div>
         </div>
     </section>

@@ -16,7 +16,7 @@ class CategoryController extends Controller
 
     public function index()
     {
-        $categoryData = $this->category->where('type','food')->get();
+        $categoryData = $this->category->where('type','food')->latest()->paginate(20);
         return view('category',compact('categoryData'));
     }
     public function store(Request $request)
@@ -52,10 +52,9 @@ class CategoryController extends Controller
 
     public function update(Request $request, $id)
     {
-        //validate input
         $request->validate([
             'title' => 'required|string|max:255',
-            'company' => 'nullable|string|max:255'
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
         ]);
         $category = $this->category->find($id);
         $category->title = $request->input('title');

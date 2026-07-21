@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
 use Symfony\Component\Mailer\Transport\Dsn;
@@ -13,6 +14,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        Paginator::useBootstrapFive();
+
         Mail::extend('smtp', function (array $config) {
             $scheme = match(true) {
                 ($config['encryption'] ?? '') === 'ssl'  => 'smtps',

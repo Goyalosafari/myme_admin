@@ -103,6 +103,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                <div class="mt-3">{{ $groceryData->links() }}</div>
             </div>
         </div>
     </section>

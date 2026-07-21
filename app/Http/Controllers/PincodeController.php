@@ -16,7 +16,7 @@ class PincodeController extends Controller
 
     public function index()
     {
-        $pincodeData = $this->pincode->all();
+        $pincodeData = $this->pincode->latest()->paginate(20);
         return view('pincode',compact('pincodeData'));
     }
     public function store(Request $request)

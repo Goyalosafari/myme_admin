@@ -16,7 +16,7 @@ class NotificationController extends Controller
 
     public function index()
     {
-        $datas = $this->notification->all();
+        $datas = $this->notification->latest()->paginate(20);
         return view('notification',compact('datas'));
     }
     public function store(Request $request)
