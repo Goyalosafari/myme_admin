@@ -24,26 +24,31 @@ class PincodeController extends Controller
     {
         return [
             'pincode'      => 'required|string|max:10',
-            'place_name'   => 'nullable|string|max:100',
-            'district'     => 'nullable|string|max:100',
-            'state'        => 'nullable|string|max:100',
-            'delivery_fee' => 'nullable|numeric|min:0',
-            'other_fee'    => 'nullable|numeric|min:0',
+            'place_name'   => 'required|string|max:100',
+            'district'     => 'required|string|max:100',
+            'state'        => 'required|string|max:100',
+            'delivery_fee' => 'required|numeric|min:0',
+            'other_fee'    => 'required|numeric|min:0',
         ];
     }
 
     private function messages(): array
     {
         return [
-            'pincode.required'      => 'Pincode is required.',
-            'pincode.max'           => 'Pincode must not exceed 10 characters.',
-            'place_name.max'        => 'Place name must not exceed 100 characters.',
-            'district.max'          => 'District must not exceed 100 characters.',
-            'state.max'             => 'State must not exceed 100 characters.',
-            'delivery_fee.numeric'  => 'Delivery fee must be a valid number.',
-            'delivery_fee.min'      => 'Delivery fee cannot be negative.',
-            'other_fee.numeric'     => 'Other fee must be a valid number.',
-            'other_fee.min'         => 'Other fee cannot be negative.',
+            'pincode.required'       => 'Pincode is required.',
+            'pincode.max'            => 'Pincode must not exceed 10 characters.',
+            'place_name.required'    => 'Place name is required.',
+            'place_name.max'         => 'Place name must not exceed 100 characters.',
+            'district.required'      => 'District is required.',
+            'district.max'           => 'District must not exceed 100 characters.',
+            'state.required'         => 'State is required.',
+            'state.max'              => 'State must not exceed 100 characters.',
+            'delivery_fee.required'  => 'Delivery fee is required.',
+            'delivery_fee.numeric'   => 'Delivery fee must be a valid number.',
+            'delivery_fee.min'       => 'Delivery fee cannot be negative.',
+            'other_fee.required'     => 'Other fee is required.',
+            'other_fee.numeric'      => 'Other fee must be a valid number.',
+            'other_fee.min'          => 'Other fee cannot be negative.',
         ];
     }
 
