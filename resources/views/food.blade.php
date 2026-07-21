@@ -145,8 +145,9 @@
                             <input type="text" name="cooking_time" id="m_cooking_time" class="form-control" placeholder="e.g. 30 mins">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Taste</label>
+                            <label class="form-label">Taste <span class="text-danger">*</span></label>
                             <input type="text" name="taste" id="m_taste" class="form-control" placeholder="e.g. Spicy">
+                            @error('taste')<span class="text-danger small">{{ $message }}</span>@enderror
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Price <span class="text-danger">*</span></label>
@@ -154,12 +155,14 @@
                             @error('price')<span class="text-danger small">{{ $message }}</span>@enderror
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Offer Price</label>
+                            <label class="form-label">Offer Price <span class="text-danger">*</span></label>
                             <input type="number" step="0.01" name="offer_price" id="m_offer_price" class="form-control" placeholder="0.00">
+                            @error('offer_price')<span class="text-danger small">{{ $message }}</span>@enderror
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">MRP</label>
+                            <label class="form-label">MRP <span class="text-danger">*</span></label>
                             <input type="number" step="0.01" name="mrp" id="m_mrp" class="form-control" placeholder="0.00">
+                            @error('mrp')<span class="text-danger small">{{ $message }}</span>@enderror
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Margin</label>
@@ -171,24 +174,27 @@
                             @error('gst')<span class="text-danger small">{{ $message }}</span>@enderror
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Veg</label>
+                            <label class="form-label">Veg <span class="text-danger">*</span></label>
                             <select name="veg" id="m_veg" class="form-select">
                                 <option value="">Select</option>
                                 <option value="yes">Yes</option>
                                 <option value="no">No</option>
                             </select>
+                            @error('veg')<span class="text-danger small">{{ $message }}</span>@enderror
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Preferences</label>
                             <input type="text" name="preferences" id="m_preferences" class="form-control" placeholder="Preferences">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Meal Type</label>
+                            <label class="form-label">Meal Type <span class="text-danger">*</span></label>
                             <input type="text" name="meal_type" id="m_meal_type" class="form-control" placeholder="e.g. Breakfast">
+                            @error('meal_type')<span class="text-danger small">{{ $message }}</span>@enderror
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Food Details</label>
+                            <label class="form-label">Food Details <span class="text-danger">*</span></label>
                             <input type="text" name="food_details" id="m_food_details" class="form-control" placeholder="Short description">
+                            @error('food_details')<span class="text-danger small">{{ $message }}</span>@enderror
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Category <span class="text-danger">*</span></label>
@@ -257,30 +263,45 @@ $(function () {
     $('#foodForm').on('submit', function (e) {
         clearFoodErrors();
         var ok = true;
-        var title     = $.trim($('#m_title').val());
-        var price     = $.trim($('#m_price').val());
-        var offerPrice= $.trim($('#m_offer_price').val());
-        var gst       = $.trim($('#m_gst').val());
-        var cats      = $('#m_categories').val();
-        var isCreate  = ($('#formMethod').val() === 'POST');
-        var hasImage  = ($('#m_image')[0].files.length > 0);
+        var title       = $.trim($('#m_title').val());
+        var taste       = $.trim($('#m_taste').val());
+        var price       = $.trim($('#m_price').val());
+        var offerPrice  = $.trim($('#m_offer_price').val());
+        var mrp         = $.trim($('#m_mrp').val());
+        var gst         = $.trim($('#m_gst').val());
+        var veg         = $('#m_veg').val();
+        var mealType    = $.trim($('#m_meal_type').val());
+        var foodDetails = $.trim($('#m_food_details').val());
+        var cats        = $('#m_categories').val();
+        var isCreate    = ($('#formMethod').val() === 'POST');
+        var hasImage    = ($('#m_image')[0].files.length > 0);
 
-        if (!title) {
-            showFoodError('#m_title', 'Title is required.');
+        if (!title) { showFoodError('#m_title', 'Food name is required.'); ok = false; }
+
+        if (!taste) { showFoodError('#m_taste', 'Taste is required.'); ok = false; }
+
+        if (price === '' || isNaN(price) || parseFloat(price) < 0) {
+            showFoodError('#m_price', 'Price is required and must be 0 or greater.');
             ok = false;
         }
-        if (!price || isNaN(price) || parseFloat(price) < 0) {
-            showFoodError('#m_price', 'Price is required and must be a positive number.');
+        if (offerPrice === '' || isNaN(offerPrice) || parseFloat(offerPrice) < 0) {
+            showFoodError('#m_offer_price', 'Offer price is required and must be 0 or greater.');
             ok = false;
         }
-        if (offerPrice !== '' && (isNaN(offerPrice) || parseFloat(offerPrice) < 0)) {
-            showFoodError('#m_offer_price', 'Offer price must be a positive number.');
+        if (mrp === '' || isNaN(mrp) || parseFloat(mrp) < 0) {
+            showFoodError('#m_mrp', 'MRP is required and must be 0 or greater.');
             ok = false;
         }
         if (gst !== '' && (isNaN(gst) || parseFloat(gst) < 0 || parseFloat(gst) > 100)) {
             showFoodError('#m_gst', 'GST must be between 0 and 100.');
             ok = false;
         }
+        if (!veg) { showFoodError('#m_veg', 'Please select veg or non-veg.'); ok = false; }
+
+        if (!mealType) { showFoodError('#m_meal_type', 'Meal type is required.'); ok = false; }
+
+        if (!foodDetails) { showFoodError('#m_food_details', 'Food details are required.'); ok = false; }
+
         if (!cats || cats.length === 0) {
             $('#m_categories').addClass('is-invalid');
             $('#m_categories').closest('.col-md-6').append('<span class="js-error text-danger small">Please select at least one category.</span>');

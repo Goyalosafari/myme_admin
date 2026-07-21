@@ -14,9 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('otp', 6)->nullable()->after('mobile');
-            $table->timestamp('otp_expires_at')->nullable()->after('otp');
-            $table->boolean('mobile_verified')->default(false)->after('otp_expires_at');
+            $table->string('otp', 6)->nullable();
+            $table->timestamp('otp_expires_at')->nullable();
+            $table->boolean('mobile_verified')->default(false);
         });
     }
 

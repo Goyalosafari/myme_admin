@@ -17,58 +17,76 @@ class PincodeController extends Controller
     public function index()
     {
         $pincodeData = $this->pincode->latest()->paginate(20);
-        return view('pincode',compact('pincodeData'));
+        return view('pincode', compact('pincodeData'));
     }
+
+    private function rules(): array
+    {
+        return [
+            'pincode'      => 'required|string|max:10',
+            'place_name'   => 'nullable|string|max:100',
+            'district'     => 'nullable|string|max:100',
+            'state'        => 'nullable|string|max:100',
+            'delivery_fee' => 'nullable|numeric|min:0',
+            'other_fee'    => 'nullable|numeric|min:0',
+        ];
+    }
+
+    private function messages(): array
+    {
+        return [
+            'pincode.required'      => 'Pincode is required.',
+            'pincode.max'           => 'Pincode must not exceed 10 characters.',
+            'place_name.max'        => 'Place name must not exceed 100 characters.',
+            'district.max'          => 'District must not exceed 100 characters.',
+            'state.max'             => 'State must not exceed 100 characters.',
+            'delivery_fee.numeric'  => 'Delivery fee must be a valid number.',
+            'delivery_fee.min'      => 'Delivery fee cannot be negative.',
+            'other_fee.numeric'     => 'Other fee must be a valid number.',
+            'other_fee.min'         => 'Other fee cannot be negative.',
+        ];
+    }
+
     public function store(Request $request)
     {
-        //validate input
-        $request->validate([
-            'pincode' => 'required|string|max:255'
-        ]);
-        
-        //handle logic and store into db
+        $request->validate($this->rules(), $this->messages());
+
         $pincode = new Pincode();
         $pincode->pincode = $request->input('pincode');
         $pincode->place_name = $request->input('place_name');
         $pincode->district = $request->input('district');
         $pincode->state = $request->input('state');
-        $pincode->delivery_fee = $request->input('delivery_fee');
-        $pincode->other_fee = $request->input('other_fee');
-
+        $pincode->delivery_fee = $request->input('delivery_fee') ?? 0;
+        $pincode->other_fee = $request->input('other_fee') ?? 0;
         $pincode->save();
 
-        return redirect()->route('pincode.index')->with('success','Pincode created successfully');
+        return redirect()->route('pincode.index')->with('success', 'Pincode created successfully');
     }
 
     public function edit($id)
     {
-        $pincode = $this->pincode->find($id);
-        
-        return response()->json($pincode);
+        return response()->json($this->pincode->find($id));
     }
 
     public function update(Request $request, $id)
     {
-        //validate input
-        $request->validate([
-            'pincode' => 'required|string|max:255'
-        ]);
+        $request->validate($this->rules(), $this->messages());
 
         $pincode = $this->pincode->find($id);
         $pincode->pincode = $request->input('pincode');
         $pincode->place_name = $request->input('place_name');
         $pincode->district = $request->input('district');
         $pincode->state = $request->input('state');
-        $pincode->delivery_fee = $request->input('delivery_fee');
-        $pincode->other_fee = $request->input('other_fee');
+        $pincode->delivery_fee = $request->input('delivery_fee') ?? 0;
+        $pincode->other_fee = $request->input('other_fee') ?? 0;
         $pincode->save();
 
-        return redirect()->route('pincode.index')->with('success','Pincode updated successfully');
+        return redirect()->route('pincode.index')->with('success', 'Pincode updated successfully');
     }
+
     public function destroy($id)
     {
-        $pincode = $this->pincode->find($id);
-        $pincode->delete();
-        return redirect()->route('pincode.index')->with('success','Pincode Deleted successfully');
+        $this->pincode->find($id)->delete();
+        return redirect()->route('pincode.index')->with('success', 'Pincode deleted successfully');
     }
 }
