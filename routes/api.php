@@ -1,11 +1,5 @@
 <?php
-<<<<<<< HEAD
-=======
-use App\Http\Controllers\Auth\AuthApiController;
-use App\Http\Controllers\Auth\RegisterApiController;
-use App\Http\Controllers\Auth\OtpApiController;
 
->>>>>>> main
 use App\Http\Controllers\Api\BannerApiController;
 use App\Http\Controllers\Api\CategoryApiController;
 use App\Http\Controllers\Api\CoupenApiController;
@@ -22,6 +16,7 @@ use App\Http\Controllers\Api\TimeslotApiController;
 use App\Http\Controllers\Api\UserApiController;
 use App\Http\Controllers\Auth\AuthApiController;
 use App\Http\Controllers\Auth\RegisterApiController;
+use App\Http\Controllers\Auth\OtpApiController;
 use App\Http\Controllers\Api\UserEditApiController;
 use App\Http\Controllers\Api\AddressApiController;
 use App\Http\Controllers\Api\ConversionApiController;
@@ -38,37 +33,26 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
 // Route::post('/test-sms', [OrderBookApiController::class, 'smstest']);
 Route::post('/order-sms', [OrderBookApiController::class, 'smsorder']);
 Route::post('/cancel-sms', [OrderBookApiController::class, 'smscancel']);
-///Route::post('/send-otp', [OrderBookApiController::class, 'sendOtp']);
 
 Route::post('/deactivate-user', [UserApiController::class, 'deactivateUser']);
-
-<<<<<<< HEAD
-=======
 
 Route::post('/send-otp', [OtpApiController::class, 'sendOtp']);
 Route::post('/verify-otp', [OtpApiController::class, 'verifyOtp']);
 Route::post('/send-register-otp', [OtpApiController::class, 'sendRegisterOtp']);
 Route::post('/verify-register-otp', [OtpApiController::class, 'verifyRegisterOtp']);
 
->>>>>>> main
 Route::post('/login', [AuthApiController::class, 'login']);
 Route::post('/forgot-password', [AuthApiController::class, 'forgot'])->name('password.reset');
 Route::post('/forgot-password-otp', [AuthApiController::class, 'forgotPasswordOtp']);
 Route::post('/logout', [AuthApiController::class, 'destroy']);
 Route::post('/register', [RegisterApiController::class, 'store']);
 
-///Route::post('/otp-sms', [RegisterApiController::class, 'smsOtp']);
-
 Route::get('/categoryList/{type}', [CategoryApiController::class, 'index']);
 Route::get('/bannerList', [BannerApiController::class, 'index']);
 
-//special image link
 Route::get('/bannerHome', [BannerApiController::class, 'Banner']);
 Route::get('/homeCategory1', [BannerApiController::class, 'CategoryOne']);
 Route::get('/homeCategory2', [BannerApiController::class, 'CategoryTwo']);
@@ -92,16 +76,11 @@ Route::get('/foodList/{type}', [FoodApiController::class, 'index']);
 Route::get('/foodListByCategory/{category_id}', [FoodApiController::class, 'foodByCategory']);
 Route::get('/foodListByCategoryId/{category_id}', [FoodApiController::class, 'foodByCategoryId']);
 
-#Route::get('/foodListByCategory/{category_id}', [FoodApiController::class, 'foodByCategory']);   // for single category
-#Route::get('/foodListByCategoryId/{category_id}', [FoodApiController::class, 'foodByCategoryId']); //for multiple categoryy
-
 Route::get('/coupenCheck', [CoupenApiController::class, 'checkCoupon']);
 
 Route::get('/food/{food}', [FoodApiController::class, 'foodDetails']);
 Route::get('/timeslots', [TimeslotApiController::class, 'index']);
 Route::post('/timeslotsDate', [TimeslotApiController::class, 'getTimeSlotByDate']);
-
-// Route::post('/cancelOrder', [OrderBookApiController::class, 'cancelOrder']);
 
 Route::post('/orderBookList', [OrderBookApiController::class, 'orderBookList']);
 
@@ -110,63 +89,30 @@ Route::get('/recipeList/{food_id}', [RecipeApiController::class, 'recipeByFood']
 Route::get('/recipe/{recipe}', [RecipeApiController::class, 'recipeDetails']);
 
 Route::post('/addToCart', [OrderApiController::class, 'addToCart']);
-
 Route::post('/apply-reward-points', [OrderApiController::class, 'applyRewardPoints']);
 
-<<<<<<< HEAD
 Route::post('/rate_food', [OrderApiController::class, 'AddFoodRating']);
-
 Route::post('/updateOrder', [OrderApiController::class, 'updateOrder']);
-
 Route::get('/ordersByUserId', [OrderApiController::class, 'ordersByUserId']);
-
 Route::get('/usercartsum', [OrderApiController::class, 'userCartSum']);
-
-Route::get('/ordersByTimeslot', [OrderApiController::class, 'ordersByTimeslot']); ///for timeslot testing
-
-Route::get('/ordersByOrderId', [OrderApiController::class, 'ordersByOrderId']); ///order details new api
-
+Route::get('/ordersByTimeslot', [OrderApiController::class, 'ordersByTimeslot']);
+Route::get('/ordersByOrderId', [OrderApiController::class, 'ordersByOrderId']);
 Route::get('/ordersListByUserId', [OrderApiController::class, 'ordersByListUserId']);
 Route::get('/ordersGroupByUserId', [OrderApiController::class, 'ordersByGroupUserId']);
-
-Route::get('/OrderHistory', [OrderBookApiController::class, 'ordersHistory']); //ordersHistoryDetails
+Route::get('/OrderHistory', [OrderBookApiController::class, 'ordersHistory']);
 Route::get('/OrdersHistoryDetails', [OrderApiController::class, 'ordersHistoryDetails']);
-
-Route::get('/UserWallet', [OrderBookApiController::class, 'userWallet']); ///wallet sum
-
+Route::get('/UserWallet', [OrderBookApiController::class, 'userWallet']);
 Route::post('/createOrderBook', [OrderBookApiController::class, 'createOrderBook']);
-
-// Route::post('/test-sms', [OrderBookApiController::class, 'testSmsSending']); //smstest
 Route::post('/check-user-by-mobile', [RegisterApiController::class, 'checkUserByMobile']);
-
 Route::post('/cancelOrder', [OrderBookApiController::class, 'cancelOrder']);
-
 Route::get('/cartSumByUserId', [OrderApiController::class, 'cartSumByUserId']);
 Route::get('/gstSumByUserId', [OrderApiController::class, 'gstSumByUserId']);
-
 Route::get('/Userprofile', [UserApiController::class, 'userInfo']);
 Route::post('/update-profile', [UserApiController::class, 'update']);
-Route::post('/send-otp', [RegisterApiController::class, 'sendOtp']);
 Route::post('/send-login-otp', [RegisterApiController::class, 'sendLoginOtp']);
-
 Route::delete('/users/address', [UserApiController::class, 'deleteAddress']);
-
 Route::get('/pincode', [PincodeApiController::class, 'index']);
 Route::post('/pincodeValidation', [PincodeApiController::class, 'pincodeValidation']);
-=======
-    
-    Route::post('/cancelOrder', [OrderBookApiController::class, 'cancelOrder']);
-        
-    Route::get('/cartSumByUserId', [OrderApiController::class, 'cartSumByUserId']);
-    Route::get('/gstSumByUserId', [OrderApiController::class, 'gstSumByUserId']);
-    
-      Route::get('/Userprofile', [UserApiController::class,'userInfo']);
-    Route::post('/update-profile', [UserApiController::class,'update']);
-    Route::post('/apply-reward-points', [UserApiController::class,'applyRewardPoints']);
-    
-    Route::get('/pincode', [PincodeApiController ::class, 'index']);
-Route::post('/pincodeValidation', [PincodeApiController ::class, 'pincodeValidation']);
->>>>>>> main
 
 Route::get('/notifications', [NotificationApiController::class, 'index']);
 Route::get('/filterNotification', [NotificationApiController::class, 'filterNotification']);
@@ -174,33 +120,25 @@ Route::post('/filterNotificationByOrder', [NotificationApiController::class, 'fi
 Route::post('/ratings', [RatingsApiController::class, 'rate']);
 
 Route::post('/delete-user', [UserApiController::class, 'deactivateUser']);
-
 Route::post('/pass-user', [UserApiController::class, 'newPassword']);
-
-// Route::post('/createOrderBook', [OrderBookApiController::class, 'createOrderBook']);
-//Route::get('/ordersByUserId', [OrderApiController::class, 'ordersByUserId']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [UserApiController::class, 'index']);
-    // Route::post('/update-profile', [UserApiController::class,'update']);
 
     Route::post('/addTofavorites', [FavoritesApiController::class, 'addTofavorites']);
     Route::get('/favoritesList', [FavoritesApiController::class, 'favoritesList']);
     Route::delete('/favorites/{favorite_id}', [FavoritesApiController::class, 'remove']);
 
-    // Route::post('/addToCart', [OrderApiController::class, 'addToCart']);
-    //Route::post('/createOrderBook', [OrderBookApiController::class, 'createOrderBook']);
     Route::post('/orderBookList', [OrderBookApiController::class, 'orderBookList']);
-    // Route::get('/ordersByUserId', [OrderApiController::class, 'ordersByUserId']);
-    // Route::get('/ordersListByUserId', [OrderApiController::class, 'ordersByListUserId']);
     Route::put('/updateTimeslot/{orderId}', [OrderApiController::class, 'updateTimeSlot']);
 });
-// User profile edit APIs
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/user/update-name', [UserEditApiController::class, 'updateName']);
     Route::post('/user/update-email', [UserEditApiController::class, 'updateEmail']);
     Route::post('/user/update-mobile', [UserEditApiController::class, 'updateMobile']);
 });
+
 Route::post('/user/update-password', [UserEditApiController::class, 'updatePassword']);
 Route::post('/user/send-email-otp', [UserEditApiController::class, 'sendEmailOtp']);
 Route::get('razorpay-payment', [PaymentApiController::class, 'index'])->name('payment');

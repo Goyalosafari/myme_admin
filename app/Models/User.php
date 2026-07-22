@@ -22,24 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-<<<<<<< HEAD
-        'mobile',
-        'address1',
-        'address2',
-        'pincode1',
-        'pincode2',
-        'landmark1',
-        'landmark2',
-        'active_addr',
-        'status',
-        'coin',
-        'reward_points',
-        'referral_code',
-        'referred_by',
-=======
         'mobile','address1','address2','pincode1','pincode2','landmark1','landmark2','active_addr','status',
         'otp','otp_expires_at','mobile_verified'
->>>>>>> main
     ];
 
     /**
