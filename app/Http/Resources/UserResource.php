@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Models\LoyaltyTransaction;
+use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -46,6 +48,10 @@ class UserResource extends JsonResource
             'status'          => $this->status,
             'mobile_verified' => $this->mobile_verified,
             'addresses'       => $addresses,
+            'loyalty_points'  => LoyaltyTransaction::balanceFor($this->id),
+            'wallet_balance'  => Wallet::where('user_id', $this->id)
+                ->selectRaw('COALESCE(SUM(debit) - SUM(credit), 0) as balance')
+                ->value('balance'),
         ];
     }
 }

@@ -18,6 +18,9 @@ use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\TimeslotController;
 use App\Http\Controllers\OrderBookController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ReferralCodeController;
+use App\Http\Controllers\LoyaltySettingController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,18 +48,7 @@ Route::post('admin/otp',[LoginController::class, 'verifyOtp'])->name('admin.otp.
 
 Route::middleware(['admin.auth', 'web', 'prevent-back-history'])->group(function(){
 
-   // Route::get('/dashboard', function() {
-     //   return view('dashboard');
-   // });
-    
-    Route::get('/dashboard', function() {
-        $today = \Carbon\Carbon::today();
-        $orders = \App\Models\OrderBook::whereDate('created_at', $today)->get();
-        $orderToday = $orders->count();
-        $orderTotalAmt = $orders->sum('payment_amount');
-        $totalCustomers = \App\Models\User::count();
-        return view('dashboard', compact('orderToday', 'totalCustomers', 'orderTotalAmt'));
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/banner', [BannerController::class, 'index'])->name('banner.index');
     Route::post('/banner/post',[BannerController::class, 'store'])->name('banner.store');
@@ -122,6 +114,13 @@ Route::middleware(['admin.auth', 'web', 'prevent-back-history'])->group(function
     Route::get('/feedback', [FeedbackController::class, 'index'])->name('feedback.index');
 
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
+
+    Route::get('/referral-codes', [ReferralCodeController::class, 'index'])->name('referral.index');
+    Route::post('/referral-codes/{id}/generate', [ReferralCodeController::class, 'generate'])->name('referral.generate');
+    Route::post('/referral-codes/settings', [ReferralCodeController::class, 'updateSettings'])->name('referral.settings.update');
+
+    Route::get('/loyalty-settings', [LoyaltySettingController::class, 'index'])->name('loyalty.settings.index');
+    Route::post('/loyalty-settings', [LoyaltySettingController::class, 'update'])->name('loyalty.settings.update');
     Route::get('/change-password', [UserController::class, 'changePassword'])->name('change-password');
     Route::post('/change-password', [UserController::class, 'updatePassword'])->name('update.password');
 

@@ -15,6 +15,15 @@ use Illuminate\Support\Facades\Cache;
 
 class RegisterApiController extends Controller
 {
+    private function generateReferralCode(): string
+    {
+        do {
+            $code = 'MYME' . strtoupper(Str::random(6));
+        } while (User::where('referral_code', $code)->exists());
+
+        return $code;
+    }
+
     public function store(Request $request)
     {
         // Mobile-only registration (no email/password)
@@ -29,10 +38,12 @@ class RegisterApiController extends Controller
             }
 
             $user = User::create([
-                'name'     => $request->name,
-                'mobile'   => $request->mobile,
-                'email'    => 'mobile_' . $request->mobile . '@myme.local',
-                'password' => Hash::make(Str::random(32)),
+                'name'          => $request->name,
+                'mobile'        => $request->mobile,
+                'email'         => 'mobile_' . $request->mobile . '@myme.local',
+                'password'      => Hash::make(Str::random(32)),
+                'referral_code' => $this->generateReferralCode(),
+                'referred_by'   => $request->referral_code ?? null,
             ]);
         } else {
             // Email + OTP + password registration
@@ -55,16 +66,18 @@ class RegisterApiController extends Controller
             Cache::forget('email_otp_' . $request->email);
 
             $user = User::create([
-                'name'      => $request->name,
-                'email'     => $request->email,
-                'mobile'    => $request->mobile ?? null,
-                'password'  => Hash::make($request->password),
-                'address1'  => $request->address1 ?? null,
-                'address2'  => $request->address2 ?? null,
-                'pincode1'  => $request->pincode1 ?? null,
-                'pincode2'  => $request->pincode2 ?? null,
-                'landmark1' => $request->landmark1 ?? null,
-                'landmark2' => $request->landmark2 ?? null,
+                'name'          => $request->name,
+                'email'         => $request->email,
+                'mobile'        => $request->mobile ?? null,
+                'password'      => Hash::make($request->password),
+                'address1'      => $request->address1 ?? null,
+                'address2'      => $request->address2 ?? null,
+                'pincode1'      => $request->pincode1 ?? null,
+                'pincode2'      => $request->pincode2 ?? null,
+                'landmark1'     => $request->landmark1 ?? null,
+                'landmark2'     => $request->landmark2 ?? null,
+                'referral_code' => $this->generateReferralCode(),
+                'referred_by'   => $request->referral_code ?? null,
             ]);
         }
 

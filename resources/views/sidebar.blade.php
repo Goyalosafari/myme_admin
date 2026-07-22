@@ -73,9 +73,15 @@
                 </li>
                 <li class="sidebar-item {{request()->routeIs('users.index') ? 'active' : ''}}">
                     <a href="{{route('users.index')}}" class='sidebar-link'>
-                        <i data-feather="users" width="20"></i> 
+                        <i data-feather="users" width="20"></i>
                         <span> Users </span>
-                    </a>        
+                    </a>
+                </li>
+                <li class="sidebar-item {{request()->routeIs('referral.index') ? 'active' : ''}}">
+                    <a href="{{route('referral.index')}}" class='sidebar-link'>
+                        <i data-feather="share-2" width="20"></i>
+                        <span> Referral Codes </span>
+                    </a>
                 </li>
             </ul>
         </div>

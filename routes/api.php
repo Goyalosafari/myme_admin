@@ -136,6 +136,7 @@ Route::post('/addToCart', [OrderApiController::class, 'addToCart']);
       Route::get('/Userprofile', [UserApiController::class,'userInfo']);
     Route::post('/update-profile', [UserApiController::class,'update']);
     Route::post('/apply-reward-points', [UserApiController::class,'applyRewardPoints']);
+    Route::post('/convert-loyalty-points', [UserApiController::class,'convertLoyaltyPoints']);
     
     Route::get('/pincode', [PincodeApiController ::class, 'index']);
 Route::post('/pincodeValidation', [PincodeApiController ::class, 'pincodeValidation']);

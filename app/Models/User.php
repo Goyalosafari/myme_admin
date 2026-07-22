@@ -23,7 +23,8 @@ class User extends Authenticatable
         'email',
         'password',
         'mobile','address1','address2','pincode1','pincode2','landmark1','landmark2','active_addr','status',
-        'otp','otp_expires_at','mobile_verified'
+        'otp','otp_expires_at','mobile_verified',
+        'referral_code','referred_by'
     ];
 
     /**
@@ -44,4 +45,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function loyaltyTransactions()
+    {
+        return $this->hasMany(LoyaltyTransaction::class, 'user_id');
+    }
+
+    public function wallets()
+    {
+        return $this->hasMany(Wallet::class, 'user_id');
+    }
 }

@@ -4,8 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
+use App\Models\LoyaltySetting;
+use App\Models\LoyaltyTransaction;
 use App\Models\User;
+use App\Models\Wallet;
 use App\Traits\ApiResponse;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -59,6 +63,48 @@ class UserApiController extends Controller
     public function applyRewardPoints(Request $request)
     {
         return $this->success(['use_points' => $request->use_points]);
+    }
+
+    public function convertLoyaltyPoints(Request $request)
+    {
+        $request->validate(['user_id' => 'required|exists:users,id']);
+
+        $userId  = $request->user_id;
+        $balance = LoyaltyTransaction::balanceFor($userId);
+        $minRequired = LoyaltySetting::current()->min_points_to_convert;
+
+        if ($balance < $minRequired) {
+            return $this->error(
+                "You need at least {$minRequired} points to convert to wallet. You currently have {$balance}.",
+                422
+            );
+        }
+
+        \DB::transaction(function () use ($userId, $balance) {
+            LoyaltyTransaction::create([
+                'user_id'     => $userId,
+                'points'      => -$balance,
+                'type'        => 'redeemed',
+                'description' => 'Converted to wallet balance',
+            ]);
+
+            Wallet::create([
+                'user_id'     => $userId,
+                'debit'       => $balance,
+                'date'        => Carbon::today(),
+                'description' => 'Loyalty points converted to wallet',
+            ]);
+        });
+
+        $walletBalance = Wallet::where('user_id', $userId)
+            ->selectRaw('COALESCE(SUM(debit) - SUM(credit), 0) as balance')
+            ->value('balance');
+
+        return $this->success([
+            'converted_points' => $balance,
+            'loyalty_points'   => 0,
+            'wallet_balance'   => $walletBalance,
+        ], 'Loyalty points converted to wallet');
     }
 
     public function deactivateUser(Request $request)

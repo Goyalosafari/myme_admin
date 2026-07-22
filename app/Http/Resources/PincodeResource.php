@@ -10,10 +10,14 @@ class PincodeResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id'      => $this->id,
-            'pincode' => $this->pincode,
-            'area'    => $this->area,
-            'status'  => $this->status,
+            'id'           => $this->id,
+            'pincode'      => $this->pincode,
+            'place_name'   => $this->place_name,
+            'district'     => $this->district,
+            'state'        => $this->state,
+            'delivery_fee' => $this->delivery_fee,
+            'other_fee'    => $this->other_fee,
+            'status'       => $this->status,
         ];
     }
 }

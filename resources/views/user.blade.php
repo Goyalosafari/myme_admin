@@ -39,6 +39,8 @@
                             <th> Address </th>
                             <th> Pincode </th>
                             <th> Landmark </th>
+                            <th> Loyalty Points </th>
+                            <th> Wallet Balance </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -50,6 +52,8 @@
                             <td>A1:{{$data->address1}},A2: {{$data->address2}}</td>
                             <td>P1:{{$data->pincode1}}, P2:{{$data->pincode2}}</td>
                             <td>L1: {{$data->landmark1}}, L2:{{$data->landmark2}}</td>
+                            <td>{{ $data->loyalty_points ?? 0 }}</td>
+                            <td>₹{{ number_format(($data->wallet_debit ?? 0) - ($data->wallet_credit ?? 0), 2) }}</td>
                         </tr>
                         @endforeach
                     </tbody>

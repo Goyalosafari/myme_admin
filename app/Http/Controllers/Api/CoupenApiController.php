@@ -37,7 +37,7 @@ class CoupenApiController extends Controller
 
     public function checkCoupon(Request $request)
     {
-        $coupon = Coupen::where('code', $request->code)
+        $coupon = Coupen::where('coupen_code', $request->code)
             ->where('to_date', '>=', Carbon::today()->toDateString())
             ->first();
 

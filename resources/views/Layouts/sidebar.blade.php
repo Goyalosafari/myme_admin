@@ -70,6 +70,18 @@
                     </a>
                 </li>
 
+                <li class="sidebar-item {{ request()->routeIs('referral.index') ? 'active' : '' }}">
+                    <a href="{{ route('referral.index') }}" class="sidebar-link">
+                        <i data-feather="share-2"></i><span>Referral Codes</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item {{ request()->routeIs('loyalty.settings.index') ? 'active' : '' }}">
+                    <a href="{{ route('loyalty.settings.index') }}" class="sidebar-link">
+                        <i data-feather="gift"></i><span>Loyalty Points</span>
+                    </a>
+                </li>
+
                 <li class="sidebar-item {{ request()->routeIs('notification.index') ? 'active' : '' }}">
                     <a href="{{ route('notification.index') }}" class="sidebar-link">
                         <i data-feather="bell"></i><span>Notifications</span>

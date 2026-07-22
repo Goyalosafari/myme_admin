@@ -58,6 +58,61 @@
         </div>
     </div>
 
+    {{-- Analysis Charts --}}
+    <div class="row g-3 mb-3">
+        <div class="col-12 col-lg-7">
+            <div class="card h-100">
+                <div class="card-header">Food Order Trend — Last 30 Days</div>
+                <div class="card-body">
+                    <div style="height:280px;">
+                        <canvas id="ordersTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-5">
+            <div class="card h-100">
+                <div class="card-header">Customer Growth — Last 30 Days</div>
+                <div class="card-body">
+                    <div style="height:280px;">
+                        <canvas id="customerGrowthChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-12 col-lg-7">
+            <div class="card h-100">
+                <div class="card-header">Top 5 Selling Foods — Last 30 Days</div>
+                <div class="card-body">
+                    @if($topFoods->isEmpty())
+                        <p class="text-muted mb-0">No orders placed in the last 30 days.</p>
+                    @else
+                        <div style="height:240px;">
+                            <canvas id="topFoodsChart"></canvas>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-5">
+            <div class="card h-100">
+                <div class="card-header">Order Status — Last 30 Days</div>
+                <div class="card-body">
+                    @if($statusBreakdown->isEmpty())
+                        <p class="text-muted mb-0">No orders placed in the last 30 days.</p>
+                    @else
+                        <div style="height:240px;">
+                            <canvas id="orderStatusChart"></canvas>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Quick Links --}}
     <div class="row g-3">
         <div class="col-12">
@@ -91,3 +146,113 @@
 
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var orderLabels    = @json($orderTrendLabels);
+    var orderCounts     = @json($orderTrendCounts);
+    var orderRevenue    = @json($orderTrendRevenue);
+    var customerCounts  = @json($customerTrendCounts);
+    var topFoodLabels   = @json($topFoods->pluck('title'));
+    var topFoodQty      = @json($topFoods->pluck('total_qty'));
+    var statusLabels    = @json($statusBreakdown->keys());
+    var statusCounts    = @json($statusBreakdown->values());
+
+    new Chart(document.getElementById('ordersTrendChart'), {
+        type: 'line',
+        data: {
+            labels: orderLabels,
+            datasets: [
+                {
+                    label: 'Orders',
+                    data: orderCounts,
+                    borderColor: '#5a8dee',
+                    backgroundColor: 'rgba(90,141,238,.1)',
+                    yAxisID: 'y',
+                    tension: 0.3,
+                    fill: true,
+                },
+                {
+                    label: 'Revenue (₹)',
+                    data: orderRevenue,
+                    borderColor: '#39da8a',
+                    backgroundColor: 'rgba(57,218,138,.1)',
+                    yAxisID: 'y1',
+                    tension: 0.3,
+                    fill: true,
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            scales: {
+                y:  { position: 'left', beginAtZero: true, title: { display: true, text: 'Orders' } },
+                y1: { position: 'right', beginAtZero: true, grid: { drawOnChartArea: false }, title: { display: true, text: 'Revenue (₹)' } },
+            },
+        },
+    });
+
+    new Chart(document.getElementById('customerGrowthChart'), {
+        type: 'bar',
+        data: {
+            labels: orderLabels,
+            datasets: [{
+                label: 'New Customers',
+                data: customerCounts,
+                backgroundColor: '#2178d1',
+                borderRadius: 4,
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+        },
+    });
+
+    if (topFoodLabels.length) {
+        new Chart(document.getElementById('topFoodsChart'), {
+            type: 'bar',
+            data: {
+                labels: topFoodLabels,
+                datasets: [{
+                    label: 'Qty Sold',
+                    data: topFoodQty,
+                    backgroundColor: '#fdac41',
+                    borderRadius: 4,
+                }],
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+            },
+        });
+    }
+
+    if (statusLabels.length) {
+        new Chart(document.getElementById('orderStatusChart'), {
+            type: 'doughnut',
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    data: statusCounts,
+                    backgroundColor: ['#39da8a', '#5a8dee', '#ff5b5c', '#fdac41'],
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+            },
+        });
+    }
+});
+</script>
+@endpush

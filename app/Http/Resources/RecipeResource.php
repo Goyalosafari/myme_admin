@@ -10,11 +10,17 @@ class RecipeResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id'      => $this->id,
-            'food_id' => $this->food_id,
-            'title'   => $this->title,
-            'image'            => 'storage/' . $this->image,
-            'food'    => new FoodResource($this->whenLoaded('food')),
+            'id'                => $this->id,
+            'food_id'           => $this->food_id,
+            'category_id'       => $this->category_id,
+            'title'             => $this->title,
+            'num_of_serving'    => $this->num_of_serving,
+            'description'       => $this->description,
+            'ingredients'       => $this->ingredients,
+            'nutritional_facts' => $this->nutritional_facts,
+            'utensils'          => $this->utensils,
+            'image'             => 'storage/' . $this->image,
+            'food'              => new FoodResource($this->whenLoaded('food')),
         ];
     }
 }

@@ -12,7 +12,11 @@ class UserController extends Controller
 {
     public function index()
     {
-        $userData = User::latest()->paginate(20);
+        $userData = User::withSum('loyaltyTransactions as loyalty_points', 'points')
+            ->withSum('wallets as wallet_debit', 'debit')
+            ->withSum('wallets as wallet_credit', 'credit')
+            ->latest()
+            ->paginate(20);
         return view('user',compact('userData'));
     }
 
