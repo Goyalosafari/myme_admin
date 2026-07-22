@@ -16,7 +16,7 @@ class FeedbackController extends Controller
 
     public function index()
     {
-        $datas = $this->feedback->all();
+        $datas = $this->feedback->latest()->paginate(20);
         return view('feedback',compact('datas'));
     }
 

@@ -17,7 +17,7 @@
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class='breadcrumb-header'>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{url('/dashboard')}}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Notifications</li>
                     </ol>
                 </nav>
@@ -53,7 +53,7 @@
                             <td>{{$data->created_at}}</td>
                             <td>
                                 <a class="btn icon btn-primary edit-btn" data-id="{{$data->id}}"><i data-feather="edit"></i></a>
-                                <form id="deleteForm" style="display: inline;" action="{{ url('/notification/delete/'. $data->id) }}" method="POST">
+                                <form id="deleteForm" style="display: inline;" action="{{ route('notification.destroy', $data->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn icon btn-danger" onclick="return confirm('Are you sure you want to delete?')">
@@ -65,6 +65,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                <div class="mt-3">{{ $datas->links() }}</div>
             </div>
         </div>
     </section>
@@ -132,12 +133,12 @@
                 var notificationId = $(this).data('id');
                 
                 $.ajax({
-                   url: '/notification/'+ notificationId + '/edit',
+                   url: '{{ route('notification.edit', '__ID__') }}'.replace('__ID__', notificationId),
                    method : 'GET',
                    success: function(data){
                     $('#message').val(data.message);
                   
-                    $('#notificationForm').attr('action', '{{ url('notification/update') }}'+'/'+ notificationId);
+                    $('#notificationForm').attr('action', '{{ route('notification.update', 0) }}'.slice(0, -1) + notificationId);
                     $('#notificationForm').append('<input type="hidden" name="_method" value="PUT">'); 
                     $('#notificationForm').append('<input type="hidden" name="_token" value="{{ csrf_token() }}">'); 
                     $('#submitBtn').text('Update');

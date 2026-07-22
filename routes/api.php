@@ -1,4 +1,11 @@
 <?php
+<<<<<<< HEAD
+=======
+use App\Http\Controllers\Auth\AuthApiController;
+use App\Http\Controllers\Auth\RegisterApiController;
+use App\Http\Controllers\Auth\OtpApiController;
+
+>>>>>>> main
 use App\Http\Controllers\Api\BannerApiController;
 use App\Http\Controllers\Api\CategoryApiController;
 use App\Http\Controllers\Api\CoupenApiController;
@@ -39,8 +46,17 @@ Route::post('/order-sms', [OrderBookApiController::class, 'smsorder']);
 Route::post('/cancel-sms', [OrderBookApiController::class, 'smscancel']);
 ///Route::post('/send-otp', [OrderBookApiController::class, 'sendOtp']);
 
-Route::post('/deactivate-user', [UserController::class, 'deactivatewebUser']);
+Route::post('/deactivate-user', [UserApiController::class, 'deactivateUser']);
 
+<<<<<<< HEAD
+=======
+
+Route::post('/send-otp', [OtpApiController::class, 'sendOtp']);
+Route::post('/verify-otp', [OtpApiController::class, 'verifyOtp']);
+Route::post('/send-register-otp', [OtpApiController::class, 'sendRegisterOtp']);
+Route::post('/verify-register-otp', [OtpApiController::class, 'verifyRegisterOtp']);
+
+>>>>>>> main
 Route::post('/login', [AuthApiController::class, 'login']);
 Route::post('/forgot-password', [AuthApiController::class, 'forgot'])->name('password.reset');
 Route::post('/forgot-password-otp', [AuthApiController::class, 'forgotPasswordOtp']);
@@ -97,6 +113,7 @@ Route::post('/addToCart', [OrderApiController::class, 'addToCart']);
 
 Route::post('/apply-reward-points', [OrderApiController::class, 'applyRewardPoints']);
 
+<<<<<<< HEAD
 Route::post('/rate_food', [OrderApiController::class, 'AddFoodRating']);
 
 Route::post('/updateOrder', [OrderApiController::class, 'updateOrder']);
@@ -136,6 +153,20 @@ Route::delete('/users/address', [UserApiController::class, 'deleteAddress']);
 
 Route::get('/pincode', [PincodeApiController::class, 'index']);
 Route::post('/pincodeValidation', [PincodeApiController::class, 'pincodeValidation']);
+=======
+    
+    Route::post('/cancelOrder', [OrderBookApiController::class, 'cancelOrder']);
+        
+    Route::get('/cartSumByUserId', [OrderApiController::class, 'cartSumByUserId']);
+    Route::get('/gstSumByUserId', [OrderApiController::class, 'gstSumByUserId']);
+    
+      Route::get('/Userprofile', [UserApiController::class,'userInfo']);
+    Route::post('/update-profile', [UserApiController::class,'update']);
+    Route::post('/apply-reward-points', [UserApiController::class,'applyRewardPoints']);
+    
+    Route::get('/pincode', [PincodeApiController ::class, 'index']);
+Route::post('/pincodeValidation', [PincodeApiController ::class, 'pincodeValidation']);
+>>>>>>> main
 
 Route::get('/notifications', [NotificationApiController::class, 'index']);
 Route::get('/filterNotification', [NotificationApiController::class, 'filterNotification']);

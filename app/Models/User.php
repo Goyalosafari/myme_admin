@@ -4,13 +4,14 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -21,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+<<<<<<< HEAD
         'mobile',
         'address1',
         'address2',
@@ -34,6 +36,10 @@ class User extends Authenticatable
         'reward_points',
         'referral_code',
         'referred_by',
+=======
+        'mobile','address1','address2','pincode1','pincode2','landmark1','landmark2','active_addr','status',
+        'otp','otp_expires_at','mobile_verified'
+>>>>>>> main
     ];
 
     /**

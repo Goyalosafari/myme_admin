@@ -12,7 +12,11 @@ class UserController extends Controller
 {
     public function index()
     {
+<<<<<<< HEAD
         $userData = \App\Models\User::with('addresses')->get();
+=======
+        $userData = User::latest()->paginate(20);
+>>>>>>> main
         return view('user',compact('userData'));
     }
 

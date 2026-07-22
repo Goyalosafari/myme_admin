@@ -3,29 +3,31 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\TimeslotResource;
 use App\Models\TimeSlot;
+use App\Traits\ApiResponse;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-//use Carbon\Carbon;
-use Illuminate\Support\Carbon;
 
 class TimeslotApiController extends Controller
 {
+    use ApiResponse;
+
     public function index()
     {
-        $data = TimeSlot::all();
-        return response()->json(['data' => $data]);
+        return $this->success(TimeslotResource::collection(TimeSlot::all()));
     }
 
-  /*  public function getTimeSlotByDate(Request $request)
+    public function getTimeSlotByDate(Request $request)
     {
-        $date = Carbon::now();
-        if($request->date == $date->format('Y-m-d'))
-        { 
-            $time = $date->format('H');
-            $data = TimeSlot::where('ref1', '>' ,$time)->get();
-        }else{
-            $data = TimeSlot::get();
+        $now = Carbon::now();
+
+        if ($request->date === $now->toDateString()) {
+            $slots = TimeSlot::where('ref1', '>', $now->format('H'))->get();
+        } else {
+            $slots = TimeSlot::all();
         }
+<<<<<<< HEAD
         return response()->json(['data'=>$data]);
     }*/
     
@@ -45,8 +47,9 @@ class TimeslotApiController extends Controller
         
          //$location = Location::all();
        // return response()->json($location,200);
+=======
+
+        return $this->success(TimeslotResource::collection($slots));
+>>>>>>> main
     }
-    
-    
-    
 }

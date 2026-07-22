@@ -17,7 +17,7 @@
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class='breadcrumb-header'>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{url('/dashboard')}}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
                         <li class="breadcrumb-item active" aria-current="page"> Users </li>
                     </ol>
                 </nav>
@@ -60,6 +60,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                <div class="mt-3">{{ $userData->links() }}</div>
             </div>
         </div>
     </section>

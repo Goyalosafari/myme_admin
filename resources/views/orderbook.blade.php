@@ -17,7 +17,7 @@
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class='breadcrumb-header'>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{url('/dashboard')}}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Order Book</li>
                     </ol>
                 </nav>
@@ -84,6 +84,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                <div class="mt-3">{{ $orderBook->links() }}</div>
             </div>
         </div>
     </section>
@@ -182,7 +183,7 @@
                 
                 //make an ajax request to fetch order details
                 $.ajax({
-                    url : '/orderDetails/'+orderId,
+                    url : '{{ route('orderbook.details', '__ID__') }}'.replace('__ID__', orderId),
                     method : 'GET',
                     success: function(data){
                         var orders = data.data;
@@ -228,7 +229,7 @@
                     var csrfToken = $('meta[name=csrf-token]').attr('content');
 
                     $.ajax({
-                        url : '/changeOrderStatus/'+ orderBookId,
+                        url : '{{ route('orderbook.status', '__ID__') }}'.replace('__ID__', orderBookId),
                         method : 'POST',
                         headers: {
                             'X-CSRF-TOKEN' : csrfToken,

@@ -3,28 +3,28 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Food;
+use App\Http\Resources\RecipeResource;
 use App\Models\Recipe;
-
-use Illuminate\Http\Request;
+use App\Traits\ApiResponse;
 
 class RecipeApiController extends Controller
 {
+    use ApiResponse;
+
     public function index()
     {
-        $recipies = Recipe::with('food')->get();
-        return response()->json(['recipies'=>$recipies], 200);
+        return $this->success(RecipeResource::collection(Recipe::with('food')->get()));
     }
+
     public function recipeByFood($food_id)
     {
-        $recipies = Recipe::where('food_id',$food_id)->first();
-        return response()->json(['recipies'=>$recipies], 200);
+        return $this->success(
+            new RecipeResource(Recipe::with('food')->where('food_id', $food_id)->firstOrFail())
+        );
     }
+
     public function recipeDetails(Recipe $recipe)
     {
-        $details = $recipe->load('food');
-        return response()->json(['details'=>$details], 200);
+        return $this->success(new RecipeResource($recipe->load('food')));
     }
 }
-
-//['recipies'=>$recipies]

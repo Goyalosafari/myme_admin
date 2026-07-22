@@ -3,11 +3,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+<<<<<<< HEAD
 use Illuminate\Support\Facades\DB;
+=======
+use Illuminate\Database\Eloquent\SoftDeletes;
+>>>>>>> main
 
 class Food extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $table = 'foods';
 
     public function category()

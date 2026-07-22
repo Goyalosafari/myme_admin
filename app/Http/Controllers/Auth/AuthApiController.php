@@ -2,11 +2,21 @@
 
 namespace App\Http\Controllers\Auth;
 
+<<<<<<< HEAD
 use App\Models\Wallet;
+=======
+>>>>>>> main
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
+use App\Models\User;
+use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+<<<<<<< HEAD
 use Illuminate\Support\Facades\Mail;
+=======
+use Illuminate\Support\Facades\Hash;
+>>>>>>> main
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
 
@@ -14,6 +24,7 @@ class AuthApiController extends Controller
 {
     public function login(Request $request)
     {
+<<<<<<< HEAD
         $request->validate([
             'email' => 'nullable|email',
             'mobile' => 'nullable|string',
@@ -43,14 +54,41 @@ class AuthApiController extends Controller
         // Generate token
         $token = $user->createToken('api-token')->plainTextToken;
         $wallet = \App\Models\Wallet::where('user_id', $user->id)
+=======
+        // Support login by email or phone_number
+        if ($request->filled('phone_number')) {
+            $user = User::where('mobile', $request->phone_number)->first();
+
+            if (!$user || !Hash::check($request->password, $user->password)) {
+                return response(['message' => 'Invalid credentials'], 401);
+            }
+
+            Auth::login($user);
+        } else {
+            $credentials = $request->only('email', 'password');
+            if (!Auth::attempt($credentials)) {
+                return response(['message' => 'Invalid credentials'], 401);
+            }
+        }
+
+        $token = Auth::user()->createToken('api-token')->plainTextToken;
+        $wallet = Wallet::where('user_id', Auth::id())
+>>>>>>> main
             ->selectRaw('COALESCE((SUM(debit) - SUM(credit)), 0) as balance')
             ->first();
 
         return response([
+<<<<<<< HEAD
             'token' => $token,
             'user' => $user,
             'wallet' => $wallet,
             'message' => 'Login Successful'
+=======
+            'token'   => $token,
+            'user'    => new UserResource(Auth::user()),
+            'wallet'  => $wallet,
+            'message' => 'Login Successful',
+>>>>>>> main
         ]);
     }
 

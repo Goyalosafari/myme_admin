@@ -83,7 +83,7 @@
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class='breadcrumb-header'>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{url('/dashboard')}}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Time slots</li>
                     </ol>
                 </nav>
@@ -124,6 +124,7 @@
                             <td>{{ $data->ref }}</td>
                             <td>{{ $data->ref1 }}</td>
                             <td>
+<<<<<<< HEAD
                                 <label class="switch">
                                     <input type="checkbox" class="toggle-status" data-id="{{ $data->id }}" {{ $data->status === 'y' ? 'checked' : '' }}>
                                     <span class="slider round"></span>
@@ -133,6 +134,10 @@
                             <td>
                                 <a href="#time-slot-form" class="btn icon btn-primary edit-time_slot-btn" data-id="{{ $data->id }}"><i data-feather="edit"></i></a>
                                 <form id="deleteForm" style="display: inline;" action="{{ url('/timeslot/delete/'. $data->id) }}" method="POST">
+=======
+                                <a href="#time-slot-form" class="btn icon btn-primary edit-time_slot-btn" data-id="{{$data->id}}"><i data-feather="edit"></i></a>
+                                <form id="deleteForm" style="display: inline;" action="{{ route('timeslot.destroy', $data->id) }}" method="POST">
+>>>>>>> main
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn icon btn-danger" onclick="return confirm('Are you sure you want to delete?')">
@@ -144,6 +149,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                <div class="mt-3">{{ $datas->links() }}</div>
             </div>
         </div>
     </section>
@@ -250,12 +256,29 @@
                 scrollTop: formSectionOffset
             }, 800);
 
+<<<<<<< HEAD
             var time_slotId = $(this).data('id');
             
             $.ajax({
                 url: '/timeslot/' + time_slotId + '/edit',
                 method: 'GET',
                 success: function(data) {
+=======
+                //Animate the scrolling to the top section
+                $("html, body").animate({
+                    scrollTop: formSectionOffset
+                }, 800);
+
+                // Get the time_slot ID from the data attribute
+                var time_slotId = $(this).data('id');
+                
+                //make an AJAX request to fetch the time_slot data
+                $.ajax({
+                   url: '{{ route('timeslot.edit', '__ID__') }}'.replace('__ID__', time_slotId),
+                   method : 'GET',
+                   success: function(data){
+                    // Populate the form fields with the fetched data
+>>>>>>> main
                     $('#time_slot').val(data.time_slot);
                     $('#cutoff').val(data.cutoff);
                     $('#time_start').val(data.time_start);
@@ -263,9 +286,16 @@
                     $("#ref").val(data.ref);
                     $("#ref1").val(data.ref1);
 
+<<<<<<< HEAD
                     $('#time_slotForm').attr('action', '{{ url('timeslot/update') }}' + '/' + time_slotId);
                     $('#time_slotForm').append('<input type="hidden" name="_method" value="PUT">');
                     $('#time_slotForm').append('<input type="hidden" name="_token" value="{{ csrf_token() }}">');
+=======
+                    // Adjust the form action, method, and submit button text for update
+                    $('#time_slotForm').attr('action', '{{ route('timeslot.update', 0) }}'.slice(0, -1) + time_slotId);
+                    $('#time_slotForm').append('<input type="hidden" name="_method" value="PUT">'); // Add the _method field
+                    $('#time_slotForm').append('<input type="hidden" name="_token" value="{{ csrf_token() }}">'); // Add the CSRF token field
+>>>>>>> main
                     $('#submitBtn').text('Update');
                     $('.card-title').text('Update Time slots');
                 },
