@@ -221,20 +221,32 @@ class OrderBookApiController extends Controller
         ]);
 
         $orderBook->update(['status' => 'cancel']);
+        $user = User::find($request->user_id);
 
-        Order::where('order_book_id', $request->order_book_id)->each(function ($item) {
+        Order::where('order_book_id', $request->order_book_id)->each(function ($item) use ($orderBook, $request) {
             $item->update(['status' => 'cancel']);
             Notification::create([
-                'food_id'  => $item->food_id,
-                'order_id' => $item->id,
-                'message'  => 'Product Cancelled',
-                'general'  => 'no',
-                'status'   => 'yes',
+                'food_id'       => $item->food_id,
+                'order_id'      => $item->id,
+                'user_id'       => $request->user_id,
+                'order_book_id' => $orderBook->id,
+                'message'       => 'Product Cancelled',
+                'general'       => 'no',
+                'status'        => 'yes',
             ]);
         });
 
+        // Admin alert — single summary row per cancellation, surfaced in the admin navbar bell.
+        Notification::create([
+            'user_id'       => $request->user_id,
+            'order_book_id' => $orderBook->id,
+            'message'       => ($user->name ?? 'A customer') . " cancelled Order #{$orderBook->id} (₹" . number_format($refundAmount, 2) . ' refunded to wallet)',
+            'general'       => 'no',
+            'status'        => 'yes',
+            'is_read'       => false,
+        ]);
+
         try {
-            $user    = User::find($request->user_id);
             $message = "Dear {$user->name}, Your order #{$request->order_book_id} has been cancelled. Refund will be credited to your wallet.";
             $this->smsService->sendSms($user->mobile, $message, '1207171377044163620');
         } catch (\Exception $e) {

@@ -104,6 +104,7 @@ Route::middleware(['admin.auth', 'web', 'prevent-back-history'])->group(function
     Route::get('/notification/{id}/edit',[NotificationController::class, 'edit'])->name('notification.edit');
     Route::put('/notification/update/{id}',[NotificationController::class,'update'])->name('notification.update');
     Route::delete('/notification/delete/{id}',[NotificationController::class, 'destroy'])->name('notification.destroy');
+    Route::post('/notification/mark-alerts-read', [NotificationController::class, 'markAlertsRead'])->name('notification.markAlertsRead');
 
     Route::get('/pincode', [PincodeController::class, 'index'])->name('pincode.index');
     Route::post('/pincode/post',[PincodeController::class, 'store'])->name('pincode.store');

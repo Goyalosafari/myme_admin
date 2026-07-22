@@ -13,8 +13,15 @@ class Notification extends Model
     protected $fillable = [
         'food_id',
         'order_id',
+        'user_id',
+        'order_book_id',
         'message',
         'general',
-        'status'
+        'status',
+        'is_read',
+    ];
+
+    protected $casts = [
+        'is_read' => 'boolean',
     ];
 }

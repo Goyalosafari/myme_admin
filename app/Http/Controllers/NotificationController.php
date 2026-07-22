@@ -69,4 +69,10 @@ class NotificationController extends Controller
         $this->notification->find($id)->delete();
         return redirect()->route('notification.index')->with('success', 'Notification deleted successfully');
     }
+
+    public function markAlertsRead()
+    {
+        Notification::whereNotNull('order_book_id')->where('is_read', false)->update(['is_read' => true]);
+        return response()->json(['success' => true]);
+    }
 }

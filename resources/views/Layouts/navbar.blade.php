@@ -11,15 +11,32 @@
         <ul class="navbar-nav d-flex align-items-center ms-auto gap-1">
 
             {{-- Notifications --}}
+            @php
+                $adminAlerts = \App\Models\Notification::whereNotNull('order_book_id')->latest()->limit(5)->get();
+                $unreadAlertCount = \App\Models\Notification::whereNotNull('order_book_id')->where('is_read', false)->count();
+            @endphp
             <li class="nav-item dropdown">
-                <a href="#" data-bs-toggle="dropdown" class="nav-link position-relative" title="Notifications">
+                <a href="#" data-bs-toggle="dropdown" class="nav-link position-relative" title="Notifications" id="notificationBell">
                     <i data-feather="bell"></i>
+                    @if($unreadAlertCount > 0)
+                        <span class="badge bg-danger rounded-pill" style="position:absolute;top:2px;right:2px;font-size:9px;padding:2px 5px;">{{ $unreadAlertCount }}</span>
+                    @endif
                 </a>
-                <div class="dropdown-menu dropdown-menu-end" style="min-width:260px;">
+                <div class="dropdown-menu dropdown-menu-end" style="min-width:300px;max-height:360px;overflow-y:auto;">
                     <div class="px-3 py-2 border-bottom d-flex justify-content-between align-items-center">
-                        <span class="fw-600" style="font-size:13px;">Notifications</span>
+                        <span class="fw-600" style="font-size:13px;">Order Alerts</span>
+                        @if($unreadAlertCount > 0)
+                            <button type="button" id="markAlertsReadBtn" class="btn btn-link btn-sm p-0" style="font-size:11px;">Mark all read</button>
+                        @endif
                     </div>
-                    <div class="px-3 py-3 text-muted text-center" style="font-size:12px;">No new notifications</div>
+                    @forelse($adminAlerts as $alert)
+                        <a href="{{ route('orderbook.index') }}" class="dropdown-item d-block {{ !$alert->is_read ? 'bg-light' : '' }}" style="white-space:normal;font-size:12px;padding:8px 12px;">
+                            <div>{{ $alert->message }}</div>
+                            <div class="text-muted" style="font-size:10.5px;">{{ $alert->created_at->diffForHumans() }}</div>
+                        </a>
+                    @empty
+                        <div class="px-3 py-3 text-muted text-center" style="font-size:12px;">No new notifications</div>
+                    @endforelse
                 </div>
             </li>
 
@@ -54,3 +71,24 @@
         </ul>
     </div>
 </nav>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var btn = document.getElementById('markAlertsReadBtn');
+    if (!btn) return;
+    btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        fetch('{{ route('notification.markAlertsRead') }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json',
+            },
+        }).then(function () {
+            window.location.reload();
+        });
+    });
+});
+</script>
+@endpush
