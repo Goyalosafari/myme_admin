@@ -33,11 +33,20 @@ class SmsService
         ];
         
         $response = Http::asForm()->post($this->url, $postData);
-        
-        if ($response->successful()) {
-            return $response->body();
-        } else {
-            throw new \Exception('Error sending SMS: ' . $response->body());
+        $body     = $response->body();
+
+        if (!$response->successful()) {
+            throw new \Exception('Error sending SMS: ' . $body);
         }
+
+        // This gateway returns HTTP 200 even for rejected requests (bad auth key,
+        // insufficient balance, invalid DLT template, etc.) — the real result is
+        // only visible in the response body, e.g. {"msg":"...","msgType":"error"}.
+        $decoded = json_decode($body, true);
+        if (is_array($decoded) && ($decoded['msgType'] ?? null) === 'error') {
+            throw new \Exception('SMS gateway rejected the request: ' . ($decoded['msg'] ?? $body));
+        }
+
+        return $body;
     }
 }

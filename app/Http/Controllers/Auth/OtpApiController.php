@@ -73,7 +73,7 @@ class OtpApiController extends Controller
         try {
             $this->sms->sendSms($request->mobile, $message, $templateId);
         } catch (\Exception $e) {
-            // SMS failed — still return OTP so local testing works
+            \Log::error('Login OTP SMS failed for ' . $request->mobile . ': ' . $e->getMessage());
         }
 
         return response(['message' => 'OTP sent successfully', 'otp' => (string) $otp], 200);
@@ -93,7 +93,7 @@ class OtpApiController extends Controller
         try {
             $this->sms->sendSms($request->mobile, $message, $templateId);
         } catch (\Exception $e) {
-            // SMS failed but still return OTP for local testing
+            \Log::error('Registration OTP SMS failed for ' . $request->mobile . ': ' . $e->getMessage());
         }
 
         return response(['message' => 'OTP sent successfully', 'otp' => $otp], 200);

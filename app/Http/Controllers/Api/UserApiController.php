@@ -20,7 +20,8 @@ class UserApiController extends Controller
 
     public function index()
     {
-        return $this->success(new UserResource(Auth::user()));
+        $resource = (new UserResource(Auth::user()))->resolve();
+        return response()->json(['success' => true, 'data' => $resource, 'user' => $resource]);
     }
 
     public function userInfo(Request $request)
@@ -31,7 +32,8 @@ class UserApiController extends Controller
             return $this->error('User not found', 404);
         }
 
-        return $this->success(new UserResource($user));
+        $resource = (new UserResource($user))->resolve();
+        return response()->json(['success' => true, 'data' => $resource, 'user' => $resource]);
     }
 
     public function update(Request $request)
