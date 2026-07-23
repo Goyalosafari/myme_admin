@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
+use App\Models\Address;
 use App\Models\LoyaltySetting;
 use App\Models\LoyaltyTransaction;
+use App\Models\ReferralSetting;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Traits\ApiResponse;
@@ -38,7 +40,7 @@ class UserApiController extends Controller
 
     public function update(Request $request)
     {
-        User::where('id', $request->user_id)->update([
+        User::where('id', $request->user_id)->update(array_filter([
             'name'        => $request->name,
             'mobile'      => $request->mobile,
             'address1'    => $request->address1,
@@ -48,9 +50,143 @@ class UserApiController extends Controller
             'landmark1'   => $request->landmark1,
             'landmark2'   => $request->landmark2,
             'active_addr' => $request->active,
-        ]);
+        ], fn ($value) => !is_null($value)));
+
+        if (is_array($request->addresses)) {
+            foreach ($request->addresses as $addressData) {
+                Address::create([
+                    'user_id'     => $request->user_id,
+                    'name'        => $addressData['name'] ?? null,
+                    'phone'       => $addressData['phone'] ?? null,
+                    'address'     => $addressData['address'] ?? null,
+                    'pincode'     => $addressData['pincode'] ?? null,
+                    'landmark'    => $addressData['landmark'] ?? null,
+                    'instruction' => $addressData['instruction'] ?? null,
+                    'type'        => $addressData['type'] ?? 'home',
+                    'status'      => $addressData['status'] ?? 1,
+                    'latitude'    => $addressData['latitude'] ?? null,
+                    'longitude'   => $addressData['longitude'] ?? null,
+                ]);
+            }
+        }
 
         return $this->success(null, 'Profile updated');
+    }
+
+    private function issueLoginResponse(User $user, string $message)
+    {
+        $token  = $user->createToken('api-token')->plainTextToken;
+        $wallet = Wallet::where('user_id', $user->id)
+            ->selectRaw('COALESCE((SUM(debit) - SUM(credit)), 0) as balance')
+            ->first();
+
+        return response([
+            'token'   => $token,
+            'user'    => new UserResource($user),
+            'wallet'  => $wallet,
+            'message' => $message,
+        ]);
+    }
+
+    public function updateName(Request $request)
+    {
+        $user = User::find($request->id);
+        if (!$user) {
+            return $this->error('User not found', 404);
+        }
+
+        $user->update(['name' => $request->name]);
+
+        return $this->issueLoginResponse($user, 'Name updated successfully');
+    }
+
+    public function updateEmail(Request $request)
+    {
+        $user = User::find($request->id);
+        if (!$user) {
+            return $this->error('User not found', 404);
+        }
+
+        $user->update(['email' => $request->email]);
+
+        return $this->issueLoginResponse($user, 'Email updated successfully');
+    }
+
+    // Used by the forgot-password flow: resets a password by email with no prior auth.
+    public function updatePasswordByEmail(Request $request)
+    {
+        $request->validate([
+            'email'                 => 'required|email|exists:users,email',
+            'password'              => 'required|string|min:6|confirmed',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+        $user->update(['password' => Hash::make($request->password)]);
+
+        return $this->issueLoginResponse($user, 'Password updated successfully');
+    }
+
+    public function checkUserByMobile(Request $request)
+    {
+        $user = User::where('mobile', $request->mobile)->first();
+
+        if (!$user) {
+            return response(['message' => 'Mobile number not registered'], 404);
+        }
+
+        return $this->issueLoginResponse($user, 'Mobile number already registered');
+    }
+
+    public function redeemCoins(Request $request)
+    {
+        $userId  = $request->user_id;
+        $balance = LoyaltyTransaction::balanceFor($userId);
+        $minRequired = LoyaltySetting::current()->min_points_to_convert;
+
+        if ($balance < $minRequired || $balance <= 0) {
+            return response(['message' => 'No coins to redeem'], 400);
+        }
+
+        \DB::transaction(function () use ($userId, $balance) {
+            LoyaltyTransaction::create([
+                'user_id'     => $userId,
+                'points'      => -$balance,
+                'type'        => 'redeemed',
+                'description' => 'Converted to wallet balance',
+            ]);
+
+            Wallet::create([
+                'user_id'     => $userId,
+                'debit'       => $balance,
+                'date'        => Carbon::today(),
+                'description' => 'Coins redeemed to wallet',
+            ]);
+        });
+
+        $walletBalance = Wallet::where('user_id', $userId)
+            ->selectRaw('COALESCE(SUM(debit) - SUM(credit), 0) as balance')
+            ->value('balance');
+
+        return $this->success([
+            'converted_points' => $balance,
+            'coin'             => 0,
+            'wallet_balance'   => $walletBalance,
+        ], 'Coins redeemed successfully');
+    }
+
+    public function activeConversions()
+    {
+        $loyalty  = LoyaltySetting::current();
+        $referral = ReferralSetting::current();
+
+        return $this->success([
+            'conversion_values' => [[
+                'coin_conversion_rate'      => 1,
+                'referrer_reward_points'    => $referral->reward_amount,
+                'referee_reward_points'     => 0,
+                'minimum_applicable_amount' => $loyalty->points_per_amount,
+            ]],
+        ]);
     }
 
     public function newPassword(Request $request)

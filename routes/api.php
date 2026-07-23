@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\WalletApiController;
 use App\Http\Controllers\Api\PincodeApiController;
 use App\Http\Controllers\Api\NotificationApiController;
 use App\Http\Controllers\Api\PaymentApiController;
+use App\Http\Controllers\Api\AddressApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -48,6 +49,10 @@ Route::post('/send-otp', [OtpApiController::class, 'sendOtp']);
 Route::post('/verify-otp', [OtpApiController::class, 'verifyOtp']);
 Route::post('/send-register-otp', [OtpApiController::class, 'sendRegisterOtp']);
 Route::post('/verify-register-otp', [OtpApiController::class, 'verifyRegisterOtp']);
+Route::post('/send-login-otp', [OtpApiController::class, 'sendLoginOtp']);
+Route::post('/forgot-password-otp', [OtpApiController::class, 'forgotPasswordOtp']);
+Route::post('/user/send-email-otp', [OtpApiController::class, 'sendEmailOtp']);
+Route::post('/check-user-by-mobile', [UserApiController::class, 'checkUserByMobile']);
 
 Route::post('/login', [AuthApiController::class, 'login']);
 Route::post('/forgot-password', [AuthApiController::class, 'forgot'])->name('password.reset');
@@ -137,7 +142,15 @@ Route::post('/addToCart', [OrderApiController::class, 'addToCart']);
     Route::post('/update-profile', [UserApiController::class,'update']);
     Route::post('/apply-reward-points', [UserApiController::class,'applyRewardPoints']);
     Route::post('/convert-loyalty-points', [UserApiController::class,'convertLoyaltyPoints']);
-    
+    Route::post('/redeem-coins', [UserApiController::class, 'redeemCoins']);
+    Route::get('/active-conversions', [UserApiController::class, 'activeConversions']);
+    Route::post('/user/update-name', [UserApiController::class, 'updateName']);
+    Route::post('/user/update-email', [UserApiController::class, 'updateEmail']);
+    Route::post('/user/update-password', [UserApiController::class, 'updatePasswordByEmail']);
+    Route::put('/user/address', [AddressApiController::class, 'update']);
+    Route::delete('/users/address', [AddressApiController::class, 'destroy']);
+    Route::post('/rate_food', [RatingsApiController::class, 'rateFood']);
+
     Route::get('/pincode', [PincodeApiController ::class, 'index']);
 Route::post('/pincodeValidation', [PincodeApiController ::class, 'pincodeValidation']);
 

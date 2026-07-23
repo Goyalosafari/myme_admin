@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Address;
 use App\Models\LoyaltyTransaction;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
@@ -11,27 +12,27 @@ class UserResource extends JsonResource
 {
     public function toArray($request)
     {
-        $addresses = [];
+        $addresses = Address::where('user_id', $this->id)
+            ->where('status', 1)
+            ->get()
+            ->map(function ($address) {
+                return [
+                    'id'          => $address->id,
+                    'type'        => $address->type,
+                    'address'     => $address->address ?? '',
+                    'pincode'     => $address->pincode ?? '',
+                    'landmark'    => $address->landmark ?? '',
+                    'name'        => $address->name ?? '',
+                    'instruction' => $address->instruction,
+                    'phone'       => $address->phone ?? '',
+                    'status'      => $address->status,
+                    'latitude'    => $address->latitude,
+                    'longitude'   => $address->longitude,
+                ];
+            })
+            ->values();
 
-        if (!empty($this->address1)) {
-            $addresses[] = [
-                'type'     => 'home',
-                'address'  => $this->address1,
-                'pincode'  => $this->pincode1  ?? '',
-                'landmark' => $this->landmark1 ?? '',
-                'phone'    => $this->mobile    ?? '',
-            ];
-        }
-
-        if (!empty($this->address2)) {
-            $addresses[] = [
-                'type'     => 'work',
-                'address'  => $this->address2,
-                'pincode'  => $this->pincode2  ?? '',
-                'landmark' => $this->landmark2 ?? '',
-                'phone'    => $this->mobile    ?? '',
-            ];
-        }
+        $loyaltyPoints = LoyaltyTransaction::balanceFor($this->id);
 
         return [
             'id'              => $this->id,
@@ -48,7 +49,8 @@ class UserResource extends JsonResource
             'status'          => $this->status,
             'mobile_verified' => $this->mobile_verified,
             'addresses'       => $addresses,
-            'loyalty_points'  => LoyaltyTransaction::balanceFor($this->id),
+            'loyalty_points'  => $loyaltyPoints,
+            'coin'            => $loyaltyPoints,
             'wallet_balance'  => Wallet::where('user_id', $this->id)
                 ->selectRaw('COALESCE(SUM(debit) - SUM(credit), 0) as balance')
                 ->value('balance'),

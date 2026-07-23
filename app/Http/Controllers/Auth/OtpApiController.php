@@ -79,6 +79,49 @@ class OtpApiController extends Controller
         return response(['message' => 'OTP sent successfully', 'otp' => (string) $otp], 200);
     }
 
+    // Shared by /send-login-otp, /forgot-password-otp, /user/send-email-otp.
+    // The app generates the OTP client-side and asks us to relay it by email —
+    // verification happens client-side too (no server-side OTP is stored here).
+    private function relayEmailOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'otp'   => 'required',
+        ]);
+
+        if (!User::where('email', $request->email)->exists()) {
+            return response(['message' => 'Email not found. Please register first'], 404);
+        }
+
+        try {
+            Mail::raw(
+                "Your MYME OTP is: {$request->otp}\n\nValid for 10 minutes.",
+                function ($msg) use ($request) {
+                    $msg->to($request->email)->subject('MYME – Verification OTP');
+                }
+            );
+        } catch (\Exception $e) {
+            \Log::error('Email OTP relay failed for ' . $request->email . ': ' . $e->getMessage());
+        }
+
+        return response(['message' => 'OTP sent to ' . $request->email], 200);
+    }
+
+    public function sendLoginOtp(Request $request)
+    {
+        return $this->relayEmailOtp($request);
+    }
+
+    public function forgotPasswordOtp(Request $request)
+    {
+        return $this->relayEmailOtp($request);
+    }
+
+    public function sendEmailOtp(Request $request)
+    {
+        return $this->relayEmailOtp($request);
+    }
+
     // Registration / profile-mobile-update OTP — no existing user required
     public function sendRegisterOtp(Request $request)
     {

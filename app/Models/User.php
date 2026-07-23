@@ -55,4 +55,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Wallet::class, 'user_id');
     }
+
+    public function addresses()
+    {
+        return $this->hasMany(Address::class, 'user_id');
+    }
 }

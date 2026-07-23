@@ -11,7 +11,7 @@ class Rating extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable= [
-        'food_id', 'user_id', 'ratings', 'feedback'
+        'food_id', 'order_id', 'user_id', 'ratings', 'feedback'
     ];
     
     public function user()
