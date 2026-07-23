@@ -172,7 +172,7 @@ class OrderBookApiController extends Controller
         }
 
         return $this->success(
-            new OrderBookResource(OrderBook::with('orders')->find($orderBook->id)),
+            new OrderBookResource(OrderBook::with('orders.food')->find($orderBook->id)),
             'Order created successfully',
             201
         );
@@ -182,7 +182,7 @@ class OrderBookApiController extends Controller
     {
         return $this->success(
             OrderBookResource::collection(
-                OrderBook::with('orders')
+                OrderBook::with('orders.food')
                     ->where('user_id', $request->user_id)
                     ->where('status', 'order')
                     ->get()
@@ -260,7 +260,11 @@ class OrderBookApiController extends Controller
     {
         return $this->success(
             OrderBookResource::collection(
-                OrderBook::where('user_id', $request->user_id)->where('status', 'order')->latest()->get()
+                OrderBook::with('orders.food')
+                    ->where('user_id', $request->user_id)
+                    ->where('status', 'order')
+                    ->latest()
+                    ->get()
             )
         );
     }
