@@ -31,4 +31,8 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'msg91' => [
+        'auth_key' => env('MSG91_AUTH_KEY'),
+    ],
+
 ];

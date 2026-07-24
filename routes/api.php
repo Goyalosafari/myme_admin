@@ -47,6 +47,7 @@ Route::post('/deactivate-user', [UserApiController::class, 'deactivateUser']);
 
 Route::post('/send-otp', [OtpApiController::class, 'sendOtp']);
 Route::post('/verify-otp', [OtpApiController::class, 'verifyOtp']);
+Route::post('/verify-mobile-otp-token', [OtpApiController::class, 'verifyMobileWidgetOtp']);
 Route::post('/send-register-otp', [OtpApiController::class, 'sendRegisterOtp']);
 Route::post('/verify-register-otp', [OtpApiController::class, 'verifyRegisterOtp']);
 Route::post('/send-login-otp', [OtpApiController::class, 'sendLoginOtp']);
