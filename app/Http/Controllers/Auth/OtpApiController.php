@@ -40,10 +40,16 @@ class OtpApiController extends Controller
                 'short_url_expiry' => '3600',
                 'realTimeResponse' => '1',
                 'recipients'       => [[
-                    // The template's placeholder is literally named ##OTP## —
-                    // MSG91 substitutes by matching this key name exactly.
+                    // MSG91 substitutes by matching key name to the template's
+                    // placeholder exactly, and the account's active template
+                    // content/placeholder name has changed more than once
+                    // (##OTP## vs ##var1## seen so far). Send every common
+                    // variant — unmatched keys are simply ignored by MSG91.
                     'mobiles' => '91' . $mobile,
                     'OTP'     => $otp,
+                    'otp'     => $otp,
+                    'VAR1'    => $otp,
+                    'var1'    => $otp,
                 ]],
             ]);
         } catch (\Exception $e) {
