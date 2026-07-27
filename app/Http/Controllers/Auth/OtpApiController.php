@@ -19,7 +19,7 @@ class OtpApiController extends Controller
     // "Pending" and never delivered. So we generate/store/verify the OTP
     // ourselves (like the original design) and use MSG91's plain "Send SMS"
     // Flow API purely as the SMS transport, pointed at the verified template.
-    private function msg91SendSms(string $mobile, string $name, string $otp): bool
+    private function msg91SendSms(string $mobile, string $otp): bool
     {
         $authKey    = config('services.msg91.auth_key');
         $templateId = config('services.msg91.template_id');
@@ -40,9 +40,10 @@ class OtpApiController extends Controller
                 'short_url_expiry' => '3600',
                 'realTimeResponse' => '1',
                 'recipients'       => [[
+                    // The template's placeholder is literally named ##OTP## —
+                    // MSG91 substitutes by matching this key name exactly.
                     'mobiles' => '91' . $mobile,
-                    'VAR1'    => $name,
-                    'VAR2'    => $otp,
+                    'OTP'     => $otp,
                 ]],
             ]);
         } catch (\Exception $e) {
@@ -101,7 +102,7 @@ class OtpApiController extends Controller
 
         $otp = (string) rand(100000, 999999);
 
-        if (!$this->msg91SendSms($request->mobile, $user->name ?? 'there', $otp)) {
+        if (!$this->msg91SendSms($request->mobile, $otp)) {
             return response(['message' => 'Failed to send OTP. Please try again.'], 500);
         }
 
@@ -163,7 +164,7 @@ class OtpApiController extends Controller
 
         $otp = (string) rand(100000, 999999);
 
-        if (!$this->msg91SendSms($request->mobile, 'there', $otp)) {
+        if (!$this->msg91SendSms($request->mobile, $otp)) {
             return response(['message' => 'Failed to send OTP. Please try again.'], 500);
         }
 
