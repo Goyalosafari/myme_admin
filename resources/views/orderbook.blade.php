@@ -61,24 +61,38 @@
                     </thead>
                     <tbody>
                         @foreach($orderBook as $data)
+                        @php
+                            $statusLabel = match($data->status) {
+                                'delivered' => 'Delivered',
+                                'cancel'    => 'Cancelled',
+                                default     => 'Not Delivered',
+                            };
+                            $statusClass = match($data->status) {
+                                'delivered' => 'text-success',
+                                'cancel'    => 'text-danger',
+                                default     => '',
+                            };
+                        @endphp
                         <tr>
                             <td>{{date( 'd/m/Y , h:i A' , strtotime($data->created_at))}}</td>
                             <td>{{$data->id}}</td>
                             <td>{{$data->userDetail->name}}</td>
-            
+
                             <td>{{$data->invoice_dt}}</td>
                             <td>{{$data->coupen}}</td>
                             <td>{{$data->del_dt}}</td>
                             <td>{{$data->ref1}}</td>
                             <td>{{number_format($data->payment_amount, 2)}}</td>
-                            <td class="orderStatus-{{$data->id}} {{$data->status == 'delivered' ? 'text-success' : ''}}">{{($data->status == 'order' ? 'Not Deliver' : 'Delivered')}}</td>
+                            <td class="orderStatus-{{$data->id}} {{$statusClass}}">{{$statusLabel}}</td>
                             <td style="white-space: nowrap;"> 
                                 <a class="btn icon btn-primary view-order-detail" data-bs-toggle="modal" data-bs-target="#orderModal" data-id="{{$data->id}}">
                                     <i data-feather="eye"></i>
                                 </a>
+                                @if($data->status === 'order')
                                 <a class="btn icon btn-primary change-order-status"  data-id="{{$data->id}}">
                                     <i data-feather="check-square"></i>
                                 </a>
+                                @endif
                             </td>
                         </tr>
                         @endforeach

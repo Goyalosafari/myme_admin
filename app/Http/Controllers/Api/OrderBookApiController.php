@@ -184,7 +184,7 @@ class OrderBookApiController extends Controller
             OrderBookResource::collection(
                 OrderBook::with('orders.food')
                     ->where('user_id', $request->user_id)
-                    ->where('status', 'order')
+                    ->whereIn('status', ['order', 'delivered', 'cancel'])
                     ->get()
             )
         );
@@ -262,7 +262,7 @@ class OrderBookApiController extends Controller
             OrderBookResource::collection(
                 OrderBook::with('orders.food')
                     ->where('user_id', $request->user_id)
-                    ->where('status', 'order')
+                    ->whereIn('status', ['order', 'delivered', 'cancel'])
                     ->latest()
                     ->get()
             )
