@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Wallet;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -12,55 +13,48 @@ use Illuminate\Support\Facades\Mail;
 
 class OtpApiController extends Controller
 {
-    // MSG91 direct OTP send/verify API — replaces the old sms.ssdweb.in gateway,
-    // which never actually delivered (confirmed via DLT-template testing).
-    // No frontend changes needed: the app still calls /send-otp then /verify-otp
-    // with {mobile} / {mobile, otp} exactly as before.
-    private function msg91SendOtp(string $mobile): array
+    // MSG91's dedicated OTP product (/api/v5/otp) turned out to be tied to a
+    // DIFFERENT template store than the account's confirmed DLT-verified one
+    // ("Myme OTP", under the SMS product) — sends got stuck permanently
+    // "Pending" and never delivered. So we generate/store/verify the OTP
+    // ourselves (like the original design) and use MSG91's plain "Send SMS"
+    // Flow API purely as the SMS transport, pointed at the verified template.
+    private function msg91SendSms(string $mobile, string $name, string $otp): bool
     {
-        $authKey = config('services.msg91.auth_key');
+        $authKey    = config('services.msg91.auth_key');
+        $templateId = config('services.msg91.template_id');
 
-        if (empty($authKey)) {
-            \Log::error('MSG91 OTP send skipped — MSG91_AUTH_KEY is not configured.');
-            return ['ok' => false, 'body' => null];
-        }
-
-        $response = Http::get('https://control.msg91.com/api/v5/otp', [
-            'authkey'    => $authKey,
-            'mobile'     => '91' . $mobile,
-            'otp_expiry' => 10,
-        ]);
-
-        $result = $response->json();
-        $ok     = $response->successful() && ($result['type'] ?? null) === 'success';
-
-        if (!$ok) {
-            \Log::error('MSG91 OTP send failed for ' . $mobile . ': ' . $response->body());
-        }
-
-        return ['ok' => $ok, 'body' => $result];
-    }
-
-    private function msg91VerifyOtp(string $mobile, string $otp): bool
-    {
-        $authKey = config('services.msg91.auth_key');
-
-        if (empty($authKey)) {
-            \Log::error('MSG91 OTP verify skipped — MSG91_AUTH_KEY is not configured.');
+        if (empty($authKey) || empty($templateId)) {
+            \Log::error('MSG91 Flow SMS skipped — auth key or template id not configured.');
             return false;
         }
 
-        $response = Http::get('https://control.msg91.com/api/v5/otp/verify', [
-            'authkey' => $authKey,
-            'mobile'  => '91' . $mobile,
-            'otp'     => $otp,
-        ]);
+        try {
+            $response = Http::withHeaders([
+                'accept'       => 'application/json',
+                'authkey'      => $authKey,
+                'content-type' => 'application/json',
+            ])->post('https://control.msg91.com/api/v5/flow', [
+                'template_id'      => $templateId,
+                'short_url'        => '1',
+                'short_url_expiry' => '3600',
+                'realTimeResponse' => '1',
+                'recipients'       => [[
+                    'mobiles' => '91' . $mobile,
+                    'VAR1'    => $name,
+                    'VAR2'    => $otp,
+                ]],
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('MSG91 Flow SMS request failed for ' . $mobile . ': ' . $e->getMessage());
+            return false;
+        }
 
         $result = $response->json();
         $ok     = $response->successful() && ($result['type'] ?? null) === 'success';
 
         if (!$ok) {
-            \Log::error('MSG91 OTP verify failed for ' . $mobile . ': ' . $response->body());
+            \Log::error('MSG91 Flow SMS send failed for ' . $mobile . ': ' . $response->body());
         }
 
         return $ok;
@@ -95,7 +89,7 @@ class OtpApiController extends Controller
             return response(['message' => 'OTP sent to ' . $request->email], 200);
         }
 
-        // Mobile/SMS-based OTP (phone verification flow) — via MSG91
+        // Mobile/SMS-based OTP (phone verification flow) — via MSG91 Flow API
         $request->validate([
             'mobile' => 'required|digits:10',
         ]);
@@ -105,10 +99,16 @@ class OtpApiController extends Controller
             return response(['message' => 'Mobile number not registered'], 404);
         }
 
-        $result = $this->msg91SendOtp($request->mobile);
-        if (!$result['ok']) {
+        $otp = (string) rand(100000, 999999);
+
+        if (!$this->msg91SendSms($request->mobile, $user->name ?? 'there', $otp)) {
             return response(['message' => 'Failed to send OTP. Please try again.'], 500);
         }
+
+        $user->update([
+            'otp'            => $otp,
+            'otp_expires_at' => Carbon::now()->addMinutes(10),
+        ]);
 
         return response(['message' => 'OTP sent successfully'], 200);
     }
@@ -156,15 +156,18 @@ class OtpApiController extends Controller
         return $this->relayEmailOtp($request);
     }
 
-    // Registration / profile-mobile-update OTP — no existing user required — via MSG91
+    // Registration / profile-mobile-update OTP — no existing user required — via MSG91 Flow API
     public function sendRegisterOtp(Request $request)
     {
         $request->validate(['mobile' => 'required|digits:10']);
 
-        $result = $this->msg91SendOtp($request->mobile);
-        if (!$result['ok']) {
+        $otp = (string) rand(100000, 999999);
+
+        if (!$this->msg91SendSms($request->mobile, 'there', $otp)) {
             return response(['message' => 'Failed to send OTP. Please try again.'], 500);
         }
+
+        Cache::put('reg_otp_' . $request->mobile, $otp, 600);
 
         return response(['message' => 'OTP sent successfully'], 200);
     }
@@ -176,10 +179,13 @@ class OtpApiController extends Controller
             'otp'    => 'required',
         ]);
 
-        if (!$this->msg91VerifyOtp($request->mobile, $request->otp)) {
+        $cached = Cache::get('reg_otp_' . $request->mobile);
+
+        if (!$cached || $cached !== $request->otp) {
             return response(['message' => 'Invalid OTP'], 422);
         }
 
+        Cache::forget('reg_otp_' . $request->mobile);
         return response(['message' => 'OTP verified successfully'], 200);
     }
 
@@ -194,7 +200,7 @@ class OtpApiController extends Controller
 
         $request->validate([
             'mobile' => 'required|digits:10',
-            'otp'    => 'required',
+            'otp'    => 'required|digits:6',
         ]);
 
         $user = User::where('mobile', $request->mobile)->first();
@@ -202,11 +208,19 @@ class OtpApiController extends Controller
             return response(['message' => 'Mobile number not found'], 404);
         }
 
-        if (!$this->msg91VerifyOtp($request->mobile, $request->otp)) {
+        if ($user->otp !== $request->otp) {
             return response(['message' => 'Invalid OTP'], 422);
         }
 
-        $user->update(['mobile_verified' => true]);
+        if (Carbon::now()->gt($user->otp_expires_at)) {
+            return response(['message' => 'OTP expired'], 422);
+        }
+
+        $user->update([
+            'otp'             => null,
+            'otp_expires_at'  => null,
+            'mobile_verified' => true,
+        ]);
 
         return $this->issueMobileLoginResponse($user, 'Mobile verified successfully');
     }
