@@ -21,6 +21,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReferralCodeController;
 use App\Http\Controllers\LoyaltySettingController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\RevenueReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +50,9 @@ Route::post('admin/otp',[LoginController::class, 'verifyOtp'])->name('admin.otp.
 Route::middleware(['admin.auth', 'web', 'prevent-back-history'])->group(function(){
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/revenue-report', [RevenueReportController::class, 'index'])->name('revenue-report.index');
+    Route::get('/revenue-report/export', [RevenueReportController::class, 'export'])->name('revenue-report.export');
 
     Route::get('/banner', [BannerController::class, 'index'])->name('banner.index');
     Route::post('/banner/post',[BannerController::class, 'store'])->name('banner.store');

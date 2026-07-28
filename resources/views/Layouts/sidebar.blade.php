@@ -17,6 +17,12 @@
                     </a>
                 </li>
 
+                <li class="sidebar-item {{ request()->routeIs('revenue-report.index') ? 'active' : '' }}">
+                    <a href="{{ route('revenue-report.index') }}" class="sidebar-link">
+                        <i data-feather="bar-chart-2"></i><span>Revenue Report</span>
+                    </a>
+                </li>
+
                 <li class="sidebar-item {{ request()->routeIs('banner.index') ? 'active' : '' }}">
                     <a href="{{ route('banner.index') }}" class="sidebar-link">
                         <i data-feather="image"></i><span>Banners</span>
