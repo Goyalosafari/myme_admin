@@ -13,6 +13,8 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
+    const STATUS_DEACTIVATED = 2;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -59,5 +61,10 @@ class User extends Authenticatable
     public function addresses()
     {
         return $this->hasMany(Address::class, 'user_id');
+    }
+
+    public function isDeactivated(): bool
+    {
+        return (int) $this->status === self::STATUS_DEACTIVATED;
     }
 }

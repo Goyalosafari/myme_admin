@@ -20,6 +20,14 @@ class UserController extends Controller
         return view('user',compact('userData'));
     }
 
+    public function reactivate($id)
+    {
+        $user = User::findOrFail($id);
+        $user->update(['status' => null]);
+
+        return back()->with('success', "{$user->name}'s account has been reactivated.");
+    }
+
     public function changePassword()
     {
         return view('change_password');

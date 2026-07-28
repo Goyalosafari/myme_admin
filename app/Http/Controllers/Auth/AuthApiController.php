@@ -23,11 +23,20 @@ class AuthApiController extends Controller
                 return response(['message' => 'Invalid credentials'], 401);
             }
 
+            if ($user->isDeactivated()) {
+                return response(['message' => 'This account has been deactivated. Please contact support.'], 403);
+            }
+
             Auth::login($user);
         } else {
             $credentials = $request->only('email', 'password');
             if (!Auth::attempt($credentials)) {
                 return response(['message' => 'Invalid credentials'], 401);
+            }
+
+            if (Auth::user()->isDeactivated()) {
+                Auth::logout();
+                return response(['message' => 'This account has been deactivated. Please contact support.'], 403);
             }
         }
 

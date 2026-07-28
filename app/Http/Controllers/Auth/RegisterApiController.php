@@ -40,16 +40,19 @@ class RegisterApiController extends Controller
             $user = User::create([
                 'name'          => $request->name,
                 'mobile'        => $request->mobile,
-                'email'         => 'mobile_' . $request->mobile . '@myme.local',
+                'email'         => null,
                 'password'      => Hash::make(Str::random(32)),
                 'referral_code' => $this->generateReferralCode(),
                 'referred_by'   => $request->referral_code ?? null,
             ]);
         } else {
-            // Email + OTP + password registration
+            // Email + OTP + password registration — mobile is required too, so an
+            // account started via mobile-only signup can be matched and completed
+            // here rather than creating a duplicate user for the same phone.
             $validator = Validator::make($request->all(), [
                 'name'     => ['required', 'string', 'max:255'],
-                'email'    => ['required', 'string', 'email', 'max:255', 'unique:users'],
+                'email'    => ['required', 'string', 'email', 'max:255'],
+                'mobile'   => ['required', 'digits:10'],
                 'password' => ['required', 'string', 'min:8'],
                 'otp'      => ['required', 'digits:4'],
             ]);
@@ -65,20 +68,42 @@ class RegisterApiController extends Controller
             }
             Cache::forget('email_otp_' . $request->email);
 
-            $user = User::create([
-                'name'          => $request->name,
-                'email'         => $request->email,
-                'mobile'        => $request->mobile ?? null,
-                'password'      => Hash::make($request->password),
-                'address1'      => $request->address1 ?? null,
-                'address2'      => $request->address2 ?? null,
-                'pincode1'      => $request->pincode1 ?? null,
-                'pincode2'      => $request->pincode2 ?? null,
-                'landmark1'     => $request->landmark1 ?? null,
-                'landmark2'     => $request->landmark2 ?? null,
-                'referral_code' => $this->generateReferralCode(),
-                'referred_by'   => $request->referral_code ?? null,
-            ]);
+            $existingByPhone = User::where('mobile', $request->mobile)->first();
+            $existingByEmail = User::where('email', $request->email)->first();
+
+            if ($existingByEmail && (!$existingByPhone || $existingByEmail->id !== $existingByPhone->id)) {
+                return response(['error' => ['Email already registered. Please login.']], 409);
+            }
+
+            if ($existingByPhone && $existingByPhone->isDeactivated()) {
+                return response(['error' => ['This account has been deactivated. Please contact support.']], 403);
+            }
+
+            $attributes = [
+                'name'      => $request->name,
+                'email'     => $request->email,
+                'mobile'    => $request->mobile,
+                'password'  => Hash::make($request->password),
+                'address1'  => $request->address1 ?? null,
+                'address2'  => $request->address2 ?? null,
+                'pincode1'  => $request->pincode1 ?? null,
+                'pincode2'  => $request->pincode2 ?? null,
+                'landmark1' => $request->landmark1 ?? null,
+                'landmark2' => $request->landmark2 ?? null,
+            ];
+
+            if ($existingByPhone) {
+                // This phone number already has an account (e.g. an earlier
+                // mobile-only signup) — attach the email/password to that same
+                // record instead of creating a duplicate user for one person.
+                $existingByPhone->update($attributes);
+                $user = $existingByPhone;
+            } else {
+                $user = User::create($attributes + [
+                    'referral_code' => $this->generateReferralCode(),
+                    'referred_by'   => $request->referral_code ?? null,
+                ]);
+            }
         }
 
         // Auto-login — return token so Flutter doesn't need a separate login step

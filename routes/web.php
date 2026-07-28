@@ -115,6 +115,7 @@ Route::middleware(['admin.auth', 'web', 'prevent-back-history'])->group(function
     Route::get('/feedback', [FeedbackController::class, 'index'])->name('feedback.index');
 
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::post('/users/{id}/reactivate', [UserController::class, 'reactivate'])->name('users.reactivate');
 
     Route::get('/referral-codes', [ReferralCodeController::class, 'index'])->name('referral.index');
     Route::post('/referral-codes/{id}/generate', [ReferralCodeController::class, 'generate'])->name('referral.generate');

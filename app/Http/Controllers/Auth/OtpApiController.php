@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\CustomerOtpMail;
 use App\Models\User;
 use App\Models\Wallet;
 use Carbon\Carbon;
@@ -78,19 +79,20 @@ class OtpApiController extends Controller
                 return response(['message' => 'Email already registered. Please login.'], 409);
             }
 
-            $otp = (string) rand(1000, 9999);
+            // The app generates the OTP client-side and verifies locally against
+            // that same value, so we must email exactly what it sent — not a
+            // separately generated one, or the two would never match.
+            $otp = $request->filled('otp') ? (string) $request->otp : (string) rand(1000, 9999);
             Cache::put('email_otp_' . $request->email, $otp, 1200); // 20 minutes
 
             try {
-                Mail::raw(
-                    "Your MYME registration OTP is: {$otp}\n\nValid for 20 minutes.",
-                    function ($msg) use ($request) {
-                        $msg->to($request->email)
-                            ->subject('MYME – Email Verification OTP');
-                    }
-                );
+                Mail::to($request->email)->send(new CustomerOtpMail(
+                    otp: $otp,
+                    intro: 'Use the code below to complete your MYME registration.',
+                    expiryMinutes: 20,
+                ));
             } catch (\Exception $e) {
-                // Mail not configured — OTP still cached, dev can retrieve from cache
+                \Log::error('Registration OTP email failed for ' . $request->email . ': ' . $e->getMessage());
             }
 
             return response(['message' => 'OTP sent to ' . $request->email], 200);
@@ -135,12 +137,11 @@ class OtpApiController extends Controller
         }
 
         try {
-            Mail::raw(
-                "Your MYME OTP is: {$request->otp}\n\nValid for 10 minutes.",
-                function ($msg) use ($request) {
-                    $msg->to($request->email)->subject('MYME – Verification OTP');
-                }
-            );
+            Mail::to($request->email)->send(new CustomerOtpMail(
+                otp: (string) $request->otp,
+                intro: 'Use the code below to verify your account.',
+                expiryMinutes: 10,
+            ));
         } catch (\Exception $e) {
             \Log::error('Email OTP relay failed for ' . $request->email . ': ' . $e->getMessage());
         }
@@ -215,6 +216,10 @@ class OtpApiController extends Controller
             return response(['message' => 'Mobile number not found'], 404);
         }
 
+        if ($user->isDeactivated()) {
+            return response(['message' => 'This account has been deactivated. Please contact support.'], 403);
+        }
+
         if ($user->otp !== $request->otp) {
             return response(['message' => 'Invalid OTP'], 422);
         }
@@ -275,6 +280,10 @@ class OtpApiController extends Controller
         $user = User::where('mobile', $mobile)->first();
         if (!$user) {
             return response(['message' => 'Mobile number not registered', 'mobile' => $mobile], 404);
+        }
+
+        if ($user->isDeactivated()) {
+            return response(['message' => 'This account has been deactivated. Please contact support.'], 403);
         }
 
         $user->update(['mobile_verified' => true]);

@@ -22,7 +22,17 @@ class UserApiController extends Controller
 
     public function index()
     {
-        $resource = (new UserResource(Auth::user()))->resolve();
+        $user = Auth::user();
+
+        if (!$user) {
+            return $this->error('Unauthenticated', 401);
+        }
+
+        if ($user->isDeactivated()) {
+            return $this->error('This account has been deactivated. Please contact support.', 403);
+        }
+
+        $resource = (new UserResource($user))->resolve();
         return response()->json(['success' => true, 'data' => $resource, 'user' => $resource]);
     }
 
@@ -32,6 +42,10 @@ class UserApiController extends Controller
 
         if (!$user) {
             return $this->error('User not found', 404);
+        }
+
+        if ($user->isDeactivated()) {
+            return $this->error('This account has been deactivated. Please contact support.', 403);
         }
 
         $resource = (new UserResource($user))->resolve();
@@ -132,6 +146,10 @@ class UserApiController extends Controller
 
         if (!$user) {
             return response(['message' => 'Mobile number not registered'], 404);
+        }
+
+        if ($user->isDeactivated()) {
+            return response(['message' => 'This account has been deactivated. Please contact support.'], 403);
         }
 
         return $this->issueLoginResponse($user, 'Mobile number already registered');
@@ -253,11 +271,10 @@ class UserApiController extends Controller
             return $this->error('User not found', 404);
         }
 
-        $user->update([
-            'email'  => 'deactivated-' . $user->email,
-            'mobile' => '0000-' . $user->mobile,
-            'status' => 2,
-        ]);
+        // Email/mobile are left untouched (no longer prefixed) so an admin can
+        // cleanly restore the account later — mangling them made that a
+        // one-way trip and risked double-prefixing on repeat calls.
+        $user->update(['status' => User::STATUS_DEACTIVATED]);
 
         return $this->success(null, 'User deactivated');
     }
