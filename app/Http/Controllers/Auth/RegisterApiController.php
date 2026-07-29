@@ -60,11 +60,9 @@ class RegisterApiController extends Controller
                 return response(['error' => $validator->errors()->all()], 422);
             }
 
-            // Verify email OTP set by /send-otp
-            $cached = Cache::get('email_otp_' . $request->email);
-            if (!$cached || $cached !== $request->otp) {
-                return response(['error' => ['Invalid or expired OTP']], 422);
-            }
+            // OTP is generated and verified client-side by the app before it ever
+            // calls this endpoint — nothing to check server-side, just clear the
+            // cache entry /send-otp left behind.
             Cache::forget('email_otp_' . $request->email);
 
             $existingByPhone = User::where('mobile', $request->mobile)->first();

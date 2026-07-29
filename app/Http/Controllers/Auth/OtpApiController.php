@@ -180,18 +180,14 @@ class OtpApiController extends Controller
         return response(['message' => 'OTP sent successfully'], 200);
     }
 
+    // OTP is generated and verified client-side by the app before it ever calls
+    // this endpoint — nothing to check server-side, just clear the cache entry
+    // /send-register-otp left behind.
     public function verifyRegisterOtp(Request $request)
     {
         $request->validate([
             'mobile' => 'required|digits:10',
-            'otp'    => 'required',
         ]);
-
-        $cached = Cache::get('reg_otp_' . $request->mobile);
-
-        if (!$cached || $cached !== $request->otp) {
-            return response(['message' => 'Invalid OTP'], 422);
-        }
 
         Cache::forget('reg_otp_' . $request->mobile);
         return response(['message' => 'OTP verified successfully'], 200);
