@@ -7,10 +7,9 @@
 <style>
     .truncate {
         display: inline-block;
-        max-width: 150px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        max-width: 220px;
+        white-space: normal;
+        word-wrap: break-word;
         vertical-align: middle;
     }
 </style>
@@ -46,6 +45,7 @@
             <div class="card-header">Recipe List
             </div>
             <div class="card-body">
+                <div class="table-responsive">
                 <table class='table table-striped' id="tableRecipe">
                     <thead>
                         <tr>
@@ -89,7 +89,8 @@
                                 </span>
                             </td>
                             <td><img src="{{ asset('storage/' .$data->image)}}" alt="{{$data->image}}" srcset="" width="70px"></td>
-                            <td>
+                            <td style="white-space: nowrap;">
+                                <a href="#" class="btn icon btn-primary view-recipe-btn" data-bs-toggle="modal" data-bs-target="#recipeViewModal" data-id="{{$data->id}}"><i data-feather="eye"></i></a>
                                 <a href="#recipe-form" class="btn icon btn-primary edit-recipe-btn" data-id="{{$data->id}}"><i data-feather="edit"></i></a>
                                 <form id="deleteForm" style="display: inline;" action="{{ route('recipe.destroy', $data->id) }}" method="POST">
                                     @csrf
@@ -103,10 +104,76 @@
                         @endforeach
                     </tbody>
                 </table>
+                </div>
                 <div class="mt-3">{{ $recipeData->links() }}</div>
             </div>
         </div>
     </section>
+
+    <!-- Recipe View Modal -->
+    <div class="modal fade text-left" id="recipeViewModal" tabindex="-1" role="dialog"
+        aria-labelledby="recipeViewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info">
+            <h5 class="modal-title white" id="recipeViewModalLabel">Recipe Details</h5>
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                <i data-feather="x"></i>
+            </button>
+            </div>
+            <div class="modal-body">
+                <div class="row mt-2" style="font-weight:500; color:black">
+                    <div class="col-md-4">
+                        <img id="viewRecipeImage" src="" alt="" width="170px">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-md-4">Title:</div>
+                            <div class="col-md-8 view-title"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">Category:</div>
+                            <div class="col-md-8 view-category"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">Food:</div>
+                            <div class="col-md-8 view-food"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">Num of serving:</div>
+                            <div class="col-md-8 view-serving"></div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row mt-2" style="font-weight:500; color:black">
+                    <div class="col-12"><strong>Description:</strong></div>
+                    <div class="col-12 view-description"></div>
+                </div>
+                <div class="row mt-2" style="font-weight:500; color:black">
+                    <div class="col-12"><strong>Ingredients:</strong></div>
+                    <div class="col-12 view-ingredients"></div>
+                </div>
+                <div class="row mt-2" style="font-weight:500; color:black">
+                    <div class="col-12"><strong>Nutritional facts:</strong></div>
+                    <div class="col-12 view-nutritional-facts"></div>
+                </div>
+                <div class="row mt-2" style="font-weight:500; color:black">
+                    <div class="col-12"><strong>Utensils:</strong></div>
+                    <div class="col-12 view-utensils"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
+                <i class="bx bx-x d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">Close</span>
+            </button>
+            </div>
+        </div>
+        </div>
+    </div>
+    <!-- Recipe View Modal ends -->
+
     <!-- //Form for recipe -->
     <section id="recipe-form">
         <div class="row match-height">
@@ -255,6 +322,31 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
         jQuery(document).ready(function ($) {
+            $(document).on('click', '.view-recipe-btn', function (e) {
+                e.preventDefault();
+
+                var recipeId = $(this).data('id');
+
+                $.ajax({
+                    url: '{{ route('recipe.show', '__ID__') }}'.replace('__ID__', recipeId),
+                    method: 'GET',
+                    success: function (data) {
+                        $('.view-title').text(data.title);
+                        $('.view-category').text(data.category ? data.category.title : '');
+                        $('.view-food').text(data.food ? data.food.title : '');
+                        $('.view-serving').text(data.num_of_serving);
+                        $('.view-description').text(data.description);
+                        $('.view-ingredients').text(data.ingredients);
+                        $('.view-nutritional-facts').text(data.nutritional_facts);
+                        $('.view-utensils').text(data.utensils);
+                        $('#viewRecipeImage').attr('src', "{{asset('storage/')}}" + '/' + data.image);
+                    },
+                    error: function (error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
+
             $(document).on('click', '.edit-recipe-btn', function (e) {
                 e.preventDefault();
 

@@ -76,6 +76,7 @@ Route::middleware(['admin.auth', 'web', 'prevent-back-history'])->group(function
     Route::get('/recipe', [RecipeController::class, 'index'])->name('recipe.index');
     Route::post('/recipe/post',[RecipeController::class, 'store'])->name('recipe.store');
     Route::get('/recipe/{id}/edit',[RecipeController::class, 'edit'])->name('recipe.edit');
+    Route::get('/recipe/{id}/show',[RecipeController::class, 'show'])->name('recipe.show');
     Route::put('/recipe/update/{id}',[RecipeController::class,'update'])->name('recipe.update');
     Route::delete('/recipe/delete/{id}',[RecipeController::class, 'destroy'])->name('recipe.destroy');
 

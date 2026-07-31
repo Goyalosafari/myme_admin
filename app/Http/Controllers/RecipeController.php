@@ -87,6 +87,11 @@ class RecipeController extends Controller
         return response()->json($this->recipe->find($id));
     }
 
+    public function show($id)
+    {
+        return response()->json($this->recipe->with('category', 'food')->find($id));
+    }
+
     public function update(Request $request, $id)
     {
         $request->validate($this->rules(false), $this->messages());

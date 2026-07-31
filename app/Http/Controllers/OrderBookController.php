@@ -27,11 +27,18 @@ class OrderBookController extends Controller
     public function orderDetails($orderBookIId)
     {
         $data = Order::with('food','user')->where('order_book_id', $orderBookIId)->get();
-        $deliveryDate = OrderBook::where('id', $orderBookIId)->pluck('del_dt')->first();
-        $formattedDate = Carbon::parse($deliveryDate)->toDateString();
-        $time_slot = OrderBook::where('id', $orderBookIId)->pluck('ref1')->first();
+        $orderBook = OrderBook::where('id', $orderBookIId)->first();
+        $formattedDate = Carbon::parse($orderBook->del_dt)->toDateString();
 
-        return response()->json(['data'=> $data, 'deliveryDate'=> $formattedDate, 'time_slot' =>$time_slot]);
+        return response()->json([
+            'data'           => $data,
+            'deliveryDate'   => $formattedDate,
+            'time_slot'      => $orderBook->ref1,
+            'value'          => $orderBook->value,
+            'charge'         => $orderBook->charge,
+            'coupon'         => $orderBook->coupon,
+            'payment_amount' => $orderBook->payment_amount,
+        ]);
     }
     public function updateOrderStatus($orderBookId)
     {

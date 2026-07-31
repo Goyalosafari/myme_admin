@@ -44,6 +44,7 @@
                         </select>
                     </div>
                 </div>
+                <div class="table-responsive">
                 <table class='table table-striped' id="table1">
                     <thead>
                         <tr>
@@ -98,6 +99,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                </div>
                 <div class="mt-3">{{ $orderBook->links() }}</div>
             </div>
         </div>
@@ -140,9 +142,34 @@
                 </tr>
                 </thead>
                 <tbody>
-               
+
                 </tbody>
             </table>
+            </div>
+            <div class="row mt-2" style="font-weight:500; color:black">
+                <h5>Amount Details:</h5>
+                <hr>
+                <div class="col-md-6">
+                    Item Total:
+                </div>
+                <div class="col-md-6 item-total">
+                </div>
+                <div class="col-md-6">
+                    Delivery Amount:
+                </div>
+                <div class="col-md-6 delivery-amount">
+                </div>
+                <div class="col-md-6">
+                    Coupon Discount:
+                </div>
+                <div class="col-md-6 coupon-amount">
+                </div>
+                <div class="col-md-6">
+                    <strong>Total Payable:</strong>
+                </div>
+                <div class="col-md-6 total-amount">
+                    <strong></strong>
+                </div>
             </div>
             <div class="row mt-2" style="font-weight:500; color:black">
                 <h5>User Details:</h5>
@@ -204,6 +231,10 @@
                         
                         $('.delivery-date').text(data.deliveryDate);
                         $('.time-slot').text(data.time_slot);
+                        $('.item-total').text(parseFloat(data.value).toFixed(2));
+                        $('.delivery-amount').text(parseFloat(data.charge).toFixed(2));
+                        $('.coupon-amount').text(parseFloat(data.coupon).toFixed(2));
+                        $('.total-amount strong').text(parseFloat(data.payment_amount).toFixed(2));
 
                         //Update the table with recieved data
                         var tableBody = $('#orderDetailsTable tbody');
