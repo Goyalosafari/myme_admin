@@ -202,11 +202,16 @@ class OrderBookApiController extends Controller
             return $this->error('This order cannot be cancelled', 422);
         }
 
-        $timeslot = TimeSlot::find($orderBook->ref);
-        $now      = Carbon::now();
+        $timeslot   = TimeSlot::find($orderBook->ref);
+        $now        = Carbon::now();
+        $cutoffHour = optional($timeslot)->cutoff;
 
-        if ($orderBook->del_dt < $now->toDateString() ||
-            ($orderBook->del_dt === $now->toDateString() && $now->format('H') > optional($timeslot)->ref1)) {
+        $deliveryDatePassed = $orderBook->del_dt < $now->toDateString();
+        $cutoffPassedToday  = $orderBook->del_dt === $now->toDateString()
+            && $cutoffHour !== null
+            && (int) $now->format('H') >= (int) $cutoffHour;
+
+        if ($deliveryDatePassed || $cutoffPassedToday) {
             return $this->error('Cancellation window has passed for this order', 422);
         }
 
