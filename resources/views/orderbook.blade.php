@@ -172,27 +172,56 @@
                 </div>
             </div>
             <div class="row mt-2" style="font-weight:500; color:black">
-                <h5>User Details:</h5>
+                <h5>Account Details:</h5>
                 <hr>
                 <div class="col-md-4">
-                    Name: 
+                    Name:
                 </div>
                 <div class="col-md-8 name">
                 </div>
                 <div class="col-md-4">
-                    Email: 
+                    Email:
                 </div>
                 <div class="col-md-8 email">
                 </div>
                 <div class="col-md-4">
-                    Mobile: 
+                    Mobile:
                 </div>
                 <div class="col-md-8 mobile">
                 </div>
+            </div>
+            <div class="row mt-2" style="font-weight:500; color:black">
+                <h5>Delivery Address <small class="text-muted" style="font-weight:400;">(as selected for this order — may differ from the account holder)</small>:</h5>
+                <hr>
                 <div class="col-md-4">
-                    Address: 
+                    Receiver:
                 </div>
-                <div class="col-md-8 address">
+                <div class="col-md-8 delivery-receiver">
+                </div>
+                <div class="col-md-4">
+                    Phone:
+                </div>
+                <div class="col-md-8 delivery-phone">
+                </div>
+                <div class="col-md-4">
+                    Address:
+                </div>
+                <div class="col-md-8 delivery-address">
+                </div>
+                <div class="col-md-4">
+                    Pincode:
+                </div>
+                <div class="col-md-8 delivery-pincode">
+                </div>
+                <div class="col-md-4">
+                    Landmark:
+                </div>
+                <div class="col-md-8 delivery-landmark">
+                </div>
+                <div class="col-md-4">
+                    Instructions:
+                </div>
+                <div class="col-md-8 delivery-instruction">
                 </div>
             </div>
         </div>
@@ -236,6 +265,25 @@
                         $('.coupon-amount').text(parseFloat(data.coupon).toFixed(2));
                         $('.total-amount strong').text(parseFloat(data.payment_amount).toFixed(2));
 
+                        // Account details (from the customer's own profile — for
+                        // reference/contact only; may not match who/where the
+                        // order is actually being delivered to).
+                        if (orders.length) {
+                            $('.name').text(orders[0].user.name);
+                            $('.email').text(orders[0].user.email);
+                            $('.mobile').text(orders[0].user.mobile);
+                        }
+
+                        // Delivery address as captured AT ORDER TIME — this is
+                        // what the restaurant/rider should actually use.
+                        var delivery = data.delivery || {};
+                        $('.delivery-receiver').text(delivery.receiver_name || '—');
+                        $('.delivery-phone').text(delivery.receiver_phone || '—');
+                        $('.delivery-address').text(delivery.address || 'Not recorded for this order');
+                        $('.delivery-pincode').text(delivery.pincode || '—');
+                        $('.delivery-landmark').text(delivery.landmark || '—');
+                        $('.delivery-instruction').text(delivery.instruction || '—');
+
                         //Update the table with recieved data
                         var tableBody = $('#orderDetailsTable tbody');
                         tableBody.empty();
@@ -243,20 +291,14 @@
                         //Loop through each order and create a row in the table
                         orders.forEach(function(order){
                             var newRow = '<tr>' +
-                                '<td style="font-weight:500">' + order.food.title + '</td>' + 
+                                '<td style="font-weight:500">' + order.food.title + '</td>' +
                                 '<td class="text-bold-500 text-red" style="font-weight:500">' + order.qty + '</td>'+
                                 '<td style="font-weight:500">'+ order.price +'</td>' +
                             '</tr>';
 
                             //append new raw
                             tableBody.append(newRow);
-                            $('.name').text(order.user.name);
-                            $('.email').text(order.user.email);
-                            $('.mobile').text(order.user.mobile);
-                            $('.address').text(order.user.address1 + ', pincode:' + order.user.pincode1 + ', landmark:' + order.user.landmark1);
                         });
-
-                       
 
                     },
                     error: function(error){

@@ -38,6 +38,23 @@ class OrderBookController extends Controller
             'charge'         => $orderBook->charge,
             'coupon'         => $orderBook->coupon,
             'payment_amount' => $orderBook->payment_amount,
+            // Delivery address as it was captured AT ORDER TIME (order_books.*),
+            // not the customer's live profile — that's what a restaurant/rider
+            // actually needs, and it stays correct even if the customer edits
+            // or deletes the saved address afterwards. Falls back to the
+            // legacy free-text user/pack_user columns for orders placed before
+            // the delivery-snapshot columns existed.
+            'delivery' => [
+                'receiver_name'  => $orderBook->receiver_name,
+                'receiver_phone' => $orderBook->receiver_phone,
+                'address'        => $orderBook->delivery_address ?? $orderBook->user,
+                'pincode'        => $orderBook->delivery_pincode,
+                'landmark'       => $orderBook->delivery_landmark,
+                'latitude'       => $orderBook->delivery_latitude,
+                'longitude'      => $orderBook->delivery_longitude,
+                'instruction'    => $orderBook->delivery_instruction,
+                'type'           => $orderBook->pack_user,
+            ],
         ]);
     }
     public function updateOrderStatus($orderBookId)
