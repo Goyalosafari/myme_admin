@@ -100,6 +100,9 @@ Route::get('/coupenCheck', [CoupenApiController::class, 'checkCoupon']);
 Route::get('/food/{food}', [FoodApiController::class, 'foodDetails']);
 Route::get('/timeslots', [TimeslotApiController ::class, 'index']);
 Route::post('/timeslotsDate', [TimeslotApiController ::class, 'getTimeSlotByDate']);
+// Alias for callers using the hyphenated spelling (e.g. manual/Postman testing) —
+// same handler as /timeslots above, kept as the canonical route the app uses.
+Route::get('/time-slots', [TimeslotApiController ::class, 'index']);
 
  Route::post('/cancelOrder', [OrderBookApiController::class, 'cancelOrder']);
 
