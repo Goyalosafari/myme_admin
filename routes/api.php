@@ -96,6 +96,7 @@ Route::get('/foodListByCategoryId/{category_id}', [FoodApiController::class, 'fo
 #Route::get('/foodListByCategoryId/{category_id}', [FoodApiController::class, 'foodByCategoryId']); //for multiple categoryy
 
 Route::get('/coupenCheck', [CoupenApiController::class, 'checkCoupon']);
+Route::get('/coupenUsageCheck', [CoupenApiController::class, 'checkCouponUsage']);
 
 Route::get('/food/{food}', [FoodApiController::class, 'foodDetails']);
 Route::get('/timeslots', [TimeslotApiController ::class, 'index']);

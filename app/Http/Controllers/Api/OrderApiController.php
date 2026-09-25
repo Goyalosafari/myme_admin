@@ -142,7 +142,10 @@ class OrderApiController extends Controller
                 Order::with('food')
                     ->where('user_id', $request->user_id)
                     ->where('order_book_id', $request->order_id)
-                    ->where('status', 'order')
+                    // Any placed order (order/delivered/cancel…) — only exclude
+                    // cart rows. Filtering on 'order' alone emptied the details
+                    // screen as soon as admin marked it delivered or it was cancelled.
+                    ->where('status', '!=', 'cart')
                     ->get()
             )
         );

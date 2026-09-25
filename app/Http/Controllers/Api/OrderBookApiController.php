@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderBookResource;
+use App\Models\Coupen;
 use App\Models\Notification;
 use App\Models\Order;
 use App\Models\OrderBook;
@@ -91,6 +92,9 @@ class OrderBookApiController extends Controller
             'user_id'              => 'required',
             'charge'               => 'required|numeric',
             'coupon'               => 'required|numeric',
+            // Optional so older app builds keep working; when sent, it is what
+            // coupon usage limits are counted against.
+            'coupon_code'          => 'nullable|string|max:100',
             'wallet'               => 'required|numeric',
             'payment_status'       => 'required|string',
             'payment_mode'         => 'required|string',
@@ -118,6 +122,13 @@ class OrderBookApiController extends Controller
 
         if ($validator->fails()) {
             return $this->error('Validation failed', 422, $validator->errors());
+        }
+
+        if ($request->filled('coupon_code')) {
+            $coupen = Coupen::where('coupen_code', $request->coupon_code)->first();
+            if ($coupen && $coupen->isUsageExceeded()) {
+                return $this->error('This coupon has reached its usage limit', 422);
+            }
         }
 
         $timeslot = TimeSlot::find($request->time_slot_id);
@@ -165,6 +176,7 @@ class OrderBookApiController extends Controller
             'value'                => (float) $orderSum,
             'charge'               => $charge,
             'coupon'               => (float) $request->coupon,
+            'coupon_code'          => $request->coupon_code,
             'payment_amount'       => $orderSum + $charge - $request->coupon,
             'del_dt'               => $request->date,
             'ref'                  => $request->time_slot_id,

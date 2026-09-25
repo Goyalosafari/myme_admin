@@ -24,6 +24,7 @@ class CoupenController extends Controller
     {
         return [
             'title'         => 'required|string|max:255',
+            'narration'     => 'nullable|string|max:500',
             'coupen_code'   => 'required|string|max:100',
             'no_of_usage'   => 'required|integer|min:1',
             'discount_type' => 'required|in:flat,percentage',
@@ -40,6 +41,7 @@ class CoupenController extends Controller
         return [
             'title.required'          => 'Coupon title is required.',
             'title.max'               => 'Title must not exceed 255 characters.',
+            'narration.max'           => 'Narration must not exceed 500 characters.',
             'coupen_code.required'    => 'Coupon code is required.',
             'coupen_code.max'         => 'Coupon code must not exceed 100 characters.',
             'no_of_usage.required'    => 'Number of usages is required.',
@@ -70,6 +72,7 @@ class CoupenController extends Controller
 
         $coupen = new Coupen();
         $coupen->title = $request->input('title');
+        $coupen->narration = $request->input('narration');
         $coupen->coupen_code = $request->input('coupen_code');
         $coupen->no_of_usage = $request->input('no_of_usage');
         $coupen->discount_type = $request->input('discount_type');
@@ -94,6 +97,7 @@ class CoupenController extends Controller
 
         $coupen = $this->coupen->find($id);
         $coupen->title = $request->input('title');
+        $coupen->narration = $request->input('narration');
         $coupen->coupen_code = $request->input('coupen_code');
         $coupen->no_of_usage = $request->input('no_of_usage');
         $coupen->discount_type = $request->input('discount_type');

@@ -40,6 +40,7 @@
                     <thead>
                         <tr>
                             <th>Title</th>
+                            <th>Narration</th>
                             <th>Coupon Code</th>
                             <th>No of Usage</th>
                             <th>Discount Type</th>
@@ -55,6 +56,7 @@
                         @foreach($coupenData as $data)
                         <tr>
                             <td>{{ $data->title }}</td>
+                            <td>{{ $data->narration }}</td>
                             <td>{{ $data->coupen_code }}</td>
                             <td>{{ $data->no_of_usage }}</td>
                             <td>{{ $data->discount_type }}</td>
@@ -204,6 +206,19 @@
                                 </div>
 
                                 <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label for="narration">Narration</label>
+                                            <textarea id="narration" class="form-control" name="narration" rows="2" maxlength="500"
+                                                placeholder="e.g. Get flat ₹50 cashback using Mymee email ID">{{ old('narration') }}</textarea>
+                                            @error('narration')
+                                                <span class="text-danger small">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
                                     <div class="col-12 d-flex justify-content-end">
                                         <button type="submit" id="submitBtn" class="btn btn-primary me-1 mb-1">Submit</button>
                                         <button type="button" class="btn btn-light-secondary me-1 mb-1" id="resetBtn">Reset</button>
@@ -334,6 +349,7 @@ $(function () {
                 $('#min_amount').val(data.min_amount);
                 $('#from_date').val(data.from_date);
                 $('#to_date').val(data.to_date);
+                $('#narration').val(data.narration);
 
                 var updateUrl = '{{ route('coupen.update', '__ID__') }}'.replace('__ID__', coupenId);
                 $('#coupenForm').attr('action', updateUrl);

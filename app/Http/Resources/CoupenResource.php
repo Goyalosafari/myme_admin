@@ -13,6 +13,7 @@ class CoupenResource extends JsonResource
             'id'            => $this->id,
             'code'          => $this->coupen_code,
             'title'         => $this->title,
+            'narration'     => $this->narration,
             'no_of_usage'   => $this->no_of_usage,
             'discount_type' => $this->discount_type,
             'discount'      => $this->discount,

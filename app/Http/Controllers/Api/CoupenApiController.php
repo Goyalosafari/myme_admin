@@ -33,6 +33,7 @@ class CoupenApiController extends Controller
             ->map(fn (Coupen $c) => [
                 'id'            => $c->id,
                 'title'         => $c->title,
+                'narration'     => $c->narration,
                 'coupen_code'   => $c->coupen_code,
                 'no_of_usage'   => $c->no_of_usage,
                 'discount_type' => $c->discount_type,
@@ -76,5 +77,32 @@ class CoupenApiController extends Controller
         }
 
         return $this->success(new CoupenResource($coupon));
+    }
+
+    // Has this coupon hit its "No of Usage" limit? Counts placed orders that
+    // carried the code (cancelled ones excluded) against coupens.no_of_usage.
+    public function checkCouponUsage(Request $request)
+    {
+        $request->validate(['code' => 'required|string']);
+
+        $coupon = Coupen::where('coupen_code', $request->code)->first();
+
+        if (!$coupon) {
+            return $this->error('Coupon not found', 404);
+        }
+
+        $limit     = $coupon->no_of_usage !== null && $coupon->no_of_usage !== '' ? (int) $coupon->no_of_usage : null;
+        $usedCount = $coupon->usedCount();
+        $exceeded  = $coupon->isUsageExceeded();
+
+        return $this->success([
+            'coupon_code'     => $coupon->coupen_code,
+            'no_of_usage'     => $limit,
+            'used_count'      => $usedCount,
+            'remaining_usage' => $limit === null ? null : max($limit - $usedCount, 0),
+            'user_used_count' => $request->user_id ? $coupon->usedCount((int) $request->user_id) : null,
+            'is_exceeded'     => $exceeded,
+            'can_apply'       => !$exceeded,
+        ], $exceeded ? 'Coupon usage limit exceeded' : 'Coupon can be applied');
     }
 }

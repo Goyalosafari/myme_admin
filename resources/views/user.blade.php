@@ -40,6 +40,7 @@
                 <table class='table table-striped' id="table1">
                     <thead>
                         <tr>
+                            <th> User ID </th>
                             <th> Name </th>
                             <th> Email </th>
                             <th> Mobile </th>
@@ -55,6 +56,7 @@
                     <tbody>
                         @foreach($userData as $data)
                         <tr>
+                            <td>{{$data->id}}</td>
                             <td>{{$data->name}}</td>
                             <td>{{$data->email}}</td>
                             <td>{{$data->mobile}}</td>
