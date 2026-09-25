@@ -203,6 +203,7 @@ class UserApiController extends Controller
                 'referrer_reward_points'    => $referral->reward_amount,
                 'referee_reward_points'     => 0,
                 'minimum_applicable_amount' => $loyalty->points_per_amount,
+                'minimum_points_to_convert' => $loyalty->min_points_to_convert,
             ]],
         ]);
     }
