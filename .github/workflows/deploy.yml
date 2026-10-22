@@ -69,7 +69,8 @@ jobs:
 
             # --no-scripts: the post-install script writes to bootstrap/cache,
             # so it runs separately below as www-data.
-            $COMPOSER install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts
+            # No --no-dev: the app loads laravel/ui, which is listed under require-dev.
+            $COMPOSER install --no-interaction --prefer-dist --optimize-autoloader --no-scripts
             $ARTISAN package:discover --ansi
 
             $ARTISAN migrate --force
