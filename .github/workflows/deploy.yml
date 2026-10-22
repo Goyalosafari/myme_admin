@@ -37,10 +37,8 @@ jobs:
       - name: Check required secrets
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
-          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
           [ -n "$SSH_KEY" ] || { echo "::error::Add the SSH_KEY secret (contents of mymee-new-key.pem)"; exit 1; }
-          [ -n "$DEPLOY_PATH" ] || { echo "::error::Add the DEPLOY_PATH secret (app folder on the server)"; exit 1; }
 
       - uses: appleboy/ssh-action@v1
         with:
@@ -52,25 +50,33 @@ jobs:
           script_stop: true
           script: |
             set -e
-            cd "${{ secrets.DEPLOY_PATH }}"
+            cd "${{ secrets.DEPLOY_PATH || '/var/www/myme_admin' }}"
+
+            # storage/ and bootstrap/cache/ belong to www-data (the web server),
+            # so artisan runs as that user to be able to write there.
+            ARTISAN="sudo -n -u www-data php artisan"
 
             # Prefer a global composer; fall back to the composer.phar in the repo.
             if command -v composer >/dev/null 2>&1; then COMPOSER="composer"; else COMPOSER="php composer.phar"; fi
 
-            php artisan down --retry=15 || true
+            $ARTISAN down --retry=15 || true
             # Bring the site back up even if a later step fails.
-            trap 'php artisan up' EXIT
+            trap "$ARTISAN up" EXIT
 
             # --ff-only: refuses to deploy (instead of silently overwriting) if
             # someone edited files directly on the server.
             git pull --ff-only origin main
 
-            $COMPOSER install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+            # --no-scripts: the post-install script writes to bootstrap/cache,
+            # so it runs separately below as www-data.
+            $COMPOSER install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts
+            $ARTISAN package:discover --ansi
 
-            php artisan migrate --force
+            $ARTISAN migrate --force
 
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
+            $ARTISAN config:cache
+            # Some routes are closures; if they can't be cached, run uncached.
+            $ARTISAN route:cache || $ARTISAN route:clear
+            $ARTISAN view:cache
 
             echo "Deployed $(git rev-parse --short HEAD)"
