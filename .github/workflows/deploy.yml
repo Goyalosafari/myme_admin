@@ -33,10 +33,20 @@ jobs:
     needs: check
     runs-on: ubuntu-latest
     steps:
+      # Fail early with a clear message instead of a confusing SSH error.
+      - name: Check required secrets
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          [ -n "$SSH_KEY" ] || { echo "::error::Add the SSH_KEY secret (contents of mymee-new-key.pem)"; exit 1; }
+          [ -n "$DEPLOY_PATH" ] || { echo "::error::Add the DEPLOY_PATH secret (app folder on the server)"; exit 1; }
+
       - uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
+          # AWS EC2 server; override with SSH_HOST / SSH_USER secrets if it changes.
+          host: ${{ secrets.SSH_HOST || '13.201.45.14' }}
+          username: ${{ secrets.SSH_USER || 'ubuntu' }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
           script_stop: true
