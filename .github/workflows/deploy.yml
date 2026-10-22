@@ -1,0 +1,66 @@
+name: Deploy to live
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # allow a manual re-deploy from the Actions tab
+
+# Never run two deploys at the same time; a newer push waits for the current one.
+concurrency:
+  group: deploy-live
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: PHP syntax check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: none
+
+      # Catch a broken file before it reaches the live server.
+      - name: Lint PHP files
+        run: |
+          find app config database routes -name '*.php' -print0 \
+            | xargs -0 -n1 -P4 php -l > /dev/null
+
+  deploy:
+    name: Deploy over SSH
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script_stop: true
+          script: |
+            set -e
+            cd "${{ secrets.DEPLOY_PATH }}"
+
+            # Prefer a global composer; fall back to the composer.phar in the repo.
+            if command -v composer >/dev/null 2>&1; then COMPOSER="composer"; else COMPOSER="php composer.phar"; fi
+
+            php artisan down --retry=15 || true
+            # Bring the site back up even if a later step fails.
+            trap 'php artisan up' EXIT
+
+            # --ff-only: refuses to deploy (instead of silently overwriting) if
+            # someone edited files directly on the server.
+            git pull --ff-only origin main
+
+            $COMPOSER install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+            php artisan migrate --force
+
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+
+            echo "Deployed $(git rev-parse --short HEAD)"
