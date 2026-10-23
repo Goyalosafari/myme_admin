@@ -15,7 +15,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        // Applied-but-unused coupons give their use back.
+        $schedule->command('coupons:release-holds')->everyThirtyMinutes()->withoutOverlapping();
+
+        // Expired carts (CART_TIME) and leftover cart items.
+        $schedule->command('cart:clear')->hourly()->withoutOverlapping();
     }
 
     /**

@@ -97,6 +97,7 @@ Route::get('/foodListByCategoryId/{category_id}', [FoodApiController::class, 'fo
 
 Route::get('/coupenCheck', [CoupenApiController::class, 'checkCoupon']);
 Route::get('/coupenUsageCheck', [CoupenApiController::class, 'checkCouponUsage']);
+Route::post('/coupenRelease', [CoupenApiController::class, 'releaseCoupon']);
 
 Route::get('/food/{food}', [FoodApiController::class, 'foodDetails']);
 Route::get('/timeslots', [TimeslotApiController ::class, 'index']);
@@ -115,6 +116,8 @@ Route::get('/recipeList/{food_id}', [RecipeApiController::class, 'recipeByFood']
 Route::get('/recipe/{recipe}', [RecipeApiController::class, 'recipeDetails']);
 
 Route::post('/addToCart', [OrderApiController::class, 'addToCart']);
+Route::get('/cartTimer', [OrderApiController::class, 'cartTimer']);
+Route::post('/extendCart', [OrderApiController::class, 'extendCart']);
        Route::post('/updateOrder', [OrderApiController::class, 'updateOrder']);
        
        Route::get('/ordersByUserId', [OrderApiController::class, 'ordersByUserId']);

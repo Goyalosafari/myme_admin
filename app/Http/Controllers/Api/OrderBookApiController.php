@@ -12,6 +12,7 @@ use App\Models\Pincode;
 use App\Models\TimeSlot;
 use App\Models\User;
 use App\Models\Wallet;
+use App\Services\CartService;
 use App\Services\SmsService;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
@@ -23,10 +24,12 @@ class OrderBookApiController extends Controller
     use ApiResponse;
 
     protected $smsService;
+    protected $cart;
 
-    public function __construct(SmsService $smsService)
+    public function __construct(SmsService $smsService, CartService $cart)
     {
         $this->smsService = $smsService;
+        $this->cart       = $cart;
     }
 
     public function smstest(Request $request)
@@ -126,7 +129,8 @@ class OrderBookApiController extends Controller
 
         if ($request->filled('coupon_code')) {
             $coupen = Coupen::where('coupen_code', $request->coupon_code)->first();
-            if ($coupen && $coupen->isUsageExceeded()) {
+            // The customer's own hold (from applying it in the cart) doesn't count against them.
+            if ($coupen && $coupen->isUsageExceeded((int) $request->user_id)) {
                 return $this->error('This coupon has reached its usage limit', 422);
             }
         }
@@ -193,6 +197,14 @@ class OrderBookApiController extends Controller
             'time_slot_id'  => $request->time_slot_id,
             'date'          => $request->date,
         ]);
+
+        // The order now counts as the coupon use, so the cart hold is no longer
+        // needed; and the cart is gone, so stop its timer. An expired cart is
+        // deliberately NOT cleared here — payment may already have been taken.
+        if ($request->filled('coupon_code')) {
+            optional(Coupen::where('coupen_code', $request->coupon_code)->first())->releaseFor((int) $request->user_id);
+        }
+        $this->cart->finish($request->user_id);
 
         // Deduct wallet balance
         $walletBalance = Wallet::where('user_id', $request->user_id)

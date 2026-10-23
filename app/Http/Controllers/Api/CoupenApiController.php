@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CoupenResource;
 use App\Models\Coupen;
+use App\Models\User;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -66,6 +67,9 @@ class CoupenApiController extends Controller
         return $this->success(CoupenResource::collection($query->get()));
     }
 
+    // Validates a code. When the app sends user_id this is "apply": one use is
+    // reserved for that customer for COUPON_HOLD_TIME minutes, released by the
+    // coupons:release-holds job if no order is placed.
     public function checkCoupon(Request $request)
     {
         $coupon = Coupen::where('coupen_code', $request->code)
@@ -76,11 +80,40 @@ class CoupenApiController extends Controller
             return $this->error('Coupon not found or expired', 404);
         }
 
-        return $this->success(new CoupenResource($coupon));
+        $userId = $request->filled('user_id') ? (int) $request->user_id : null;
+
+        if ($coupon->isUsageExceeded($userId)) {
+            return $this->error('This coupon has reached its usage limit', 422);
+        }
+
+        $data = (new CoupenResource($coupon))->resolve();
+
+        if ($userId && User::whereKey($userId)->exists()) {
+            $data['hold_expires_at'] = $coupon->holdFor($userId)->expires_at->toIso8601String();
+        }
+
+        return $this->success($data);
+    }
+
+    // Customer removed the coupon from the cart: give the reserved use back.
+    public function releaseCoupon(Request $request)
+    {
+        $request->validate(['code' => 'required|string', 'user_id' => 'required|integer']);
+
+        $coupon = Coupen::where('coupen_code', $request->code)->first();
+
+        if (!$coupon) {
+            return $this->error('Coupon not found', 404);
+        }
+
+        $coupon->releaseFor((int) $request->user_id);
+
+        return $this->success(null, 'Coupon released');
     }
 
     // Has this coupon hit its "No of Usage" limit? Counts placed orders that
-    // carried the code (cancelled ones excluded) against coupens.no_of_usage.
+    // carried the code (cancelled ones excluded) plus other customers' live
+    // holds against coupens.no_of_usage.
     public function checkCouponUsage(Request $request)
     {
         $request->validate(['code' => 'required|string']);
@@ -91,16 +124,19 @@ class CoupenApiController extends Controller
             return $this->error('Coupon not found', 404);
         }
 
-        $limit     = $coupon->no_of_usage !== null && $coupon->no_of_usage !== '' ? (int) $coupon->no_of_usage : null;
+        $userId    = $request->filled('user_id') ? (int) $request->user_id : null;
+        $limit     = $coupon->usageLimit();
         $usedCount = $coupon->usedCount();
-        $exceeded  = $coupon->isUsageExceeded();
+        $heldCount = $coupon->heldCount($userId);
+        $exceeded  = $coupon->isUsageExceeded($userId);
 
         return $this->success([
             'coupon_code'     => $coupon->coupen_code,
             'no_of_usage'     => $limit,
             'used_count'      => $usedCount,
-            'remaining_usage' => $limit === null ? null : max($limit - $usedCount, 0),
-            'user_used_count' => $request->user_id ? $coupon->usedCount((int) $request->user_id) : null,
+            'held_count'      => $heldCount,
+            'remaining_usage' => $limit === null ? null : max($limit - $usedCount - $heldCount, 0),
+            'user_used_count' => $userId ? $coupon->usedCount($userId) : null,
             'is_exceeded'     => $exceeded,
             'can_apply'       => !$exceeded,
         ], $exceeded ? 'Coupon usage limit exceeded' : 'Coupon can be applied');
