@@ -153,7 +153,8 @@ Route::post('/addToCart', [OrderApiController::class, 'addToCart']);
     Route::post('/user/update-name', [UserApiController::class, 'updateName']);
     Route::post('/user/update-email', [UserApiController::class, 'updateEmail']);
     Route::post('/user/update-password', [UserApiController::class, 'updatePasswordByEmail']);
-    Route::put('/user/address', [AddressApiController::class, 'update']);
+    // PUT is what the app uses; POST/PATCH accepted too so the add/edit screen can't 405.
+    Route::match(['put', 'post', 'patch'], '/user/address', [AddressApiController::class, 'update']);
     Route::delete('/users/address', [AddressApiController::class, 'destroy']);
     Route::post('/rate_food', [RatingsApiController::class, 'rateFood']);
 

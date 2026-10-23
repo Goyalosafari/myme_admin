@@ -4,6 +4,18 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{asset('vendors/simple-datatables/style.css')}}"></link>
+<style>
+    /* Long values (e.g. deactivated-mobile_...@myme.local) wrap instead of widening the table */
+    .users-table td { word-break: break-word; }
+    .users-table th { white-space: nowrap; }
+    .users-table td:nth-child(2) { min-width: 100px; }
+    .users-table td:nth-child(3) { min-width: 170px; max-width: 220px; }
+    .users-table .address-cell { min-width: 140px; max-width: 180px; }
+    .users-table td:nth-child(4),
+    .users-table td:nth-child(7),
+    .users-table td:nth-child(8),
+    .users-table td:nth-child(9) { white-space: nowrap; }
+</style>
 @endpush
 
 @section('content')
@@ -37,7 +49,8 @@
             <div class="card-header">Users List
             </div>
             <div class="card-body">
-                <table class='table table-striped' id="table1">
+                <div class="table-responsive">
+                <table class='table table-striped align-middle users-table' id="table1">
                     <thead>
                         <tr>
                             <th> User ID </th>
@@ -45,10 +58,8 @@
                             <th> Email </th>
                             <th> Mobile </th>
                             <th> Address </th>
-                            <th> Pincode </th>
-                            <th> Landmark </th>
-                            <th> Loyalty Points </th>
-                            <th> Wallet Balance </th>
+                            <th> Points </th>
+                            <th> Wallet </th>
                             <th> Status </th>
                             <th> Action </th>
                         </tr>
@@ -60,9 +71,19 @@
                             <td>{{$data->name}}</td>
                             <td>{{$data->email}}</td>
                             <td>{{$data->mobile}}</td>
-                            <td>A1:{{$data->address1}},A2: {{$data->address2}}</td>
-                            <td>P1:{{$data->pincode1}}, P2:{{$data->pincode2}}</td>
-                            <td>L1: {{$data->landmark1}}, L2:{{$data->landmark2}}</td>
+                            @php
+                                // Profile holds up to two addresses; show only the parts that are filled in.
+                                $addresses = collect([1, 2])
+                                    ->map(fn ($n) => collect([$data->{"address$n"}, $data->{"landmark$n"}, $data->{"pincode$n"}])->filter()->implode(', '))
+                                    ->filter();
+                            @endphp
+                            <td class="address-cell">
+                                @forelse($addresses as $address)
+                                    <div>{{ $address }}</div>
+                                @empty
+                                    <span class="text-muted">—</span>
+                                @endforelse
+                            </td>
                             <td>{{ $data->loyalty_points ?? 0 }}</td>
                             <td>₹{{ number_format(($data->wallet_debit ?? 0) - ($data->wallet_credit ?? 0), 2) }}</td>
                             <td>
@@ -87,6 +108,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                </div>
                 <div class="mt-3">{{ $userData->links() }}</div>
             </div>
         </div>

@@ -36,6 +36,7 @@
         <div class="card">
             <div class="card-header">Coupon List</div>
             <div class="card-body">
+                <div class="table-responsive">
                 <table class='table table-striped' id="table1">
                     <thead>
                         <tr>
@@ -82,6 +83,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                </div>
                 <div class="mt-3">{{ $coupenData->links() }}</div>
             </div>
         </div>
