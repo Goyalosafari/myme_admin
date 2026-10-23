@@ -7,7 +7,6 @@ use App\Http\Resources\OrderResource;
 use App\Models\Food;
 use App\Models\Notification;
 use App\Models\Order;
-use App\Services\CartService;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -16,10 +15,6 @@ use Illuminate\Support\Facades\Validator;
 class OrderApiController extends Controller
 {
     use ApiResponse;
-
-    public function __construct(private CartService $cart)
-    {
-    }
 
     public function addToCart(Request $request)
     {
@@ -32,9 +27,6 @@ class OrderApiController extends Controller
         if ($validator->fails()) {
             return $this->error('Validation failed', 422, $validator->errors());
         }
-
-        // An expired cart is cleared first, so this add starts a fresh one.
-        $this->cart->clearIfExpired($request->user_id);
 
         $existing = Order::where([
             'food_id' => $request->food_id,
@@ -63,8 +55,6 @@ class OrderApiController extends Controller
             'cess'       => 0.00,
         ]);
 
-        $this->cart->start($request->user_id);
-
         Notification::create([
             'food_id'  => $request->food_id,
             'order_id' => $order->id,
@@ -78,8 +68,6 @@ class OrderApiController extends Controller
 
     public function updateOrder(Request $request)
     {
-        $this->cart->clearIfExpired($request->user_id);
-
         $order = Order::find($request->order_id);
 
         if (!$order || $order->status !== 'cart' || $order->user_id != $request->user_id) {
@@ -101,8 +89,6 @@ class OrderApiController extends Controller
 
     public function ordersByUserId(Request $request)
     {
-        $this->cart->clearIfExpired($request->user_id);
-
         return $this->success(
             OrderResource::collection(
                 Order::with('food')->where('user_id', $request->user_id)->where('status', 'cart')->get()
@@ -112,8 +98,6 @@ class OrderApiController extends Controller
 
     public function userCartSum(Request $request)
     {
-        $this->cart->clearIfExpired($request->user_id);
-
         $total = Order::where('user_id', $request->user_id)->where('status', 'cart')->sum('total');
 
         return $this->success(['totalSum' => $total]);
@@ -121,8 +105,6 @@ class OrderApiController extends Controller
 
     public function cartSumByUserId(Request $request)
     {
-        $this->cart->clearIfExpired($request->user_id);
-
         $sum = Order::where('user_id', $request->user_id)->where('status', 'cart')->sum('total');
 
         return $this->success(['order_sum' => $sum]);
@@ -130,8 +112,6 @@ class OrderApiController extends Controller
 
     public function gstSumByUserId(Request $request)
     {
-        $this->cart->clearIfExpired($request->user_id);
-
         $sum = Order::where('user_id', $request->user_id)->where('status', 'cart')->sum('gst_value');
 
         return $this->success(['gst_sum' => $sum]);
@@ -185,8 +165,6 @@ class OrderApiController extends Controller
 
     public function ordersByTimeslot(Request $request)
     {
-        $this->cart->clearIfExpired($request->user_id);
-
         return $this->success(
             OrderResource::collection(
                 Order::with('food')->where('user_id', $request->user_id)->where('status', 'cart')->get()
@@ -199,25 +177,5 @@ class OrderApiController extends Controller
         Order::where('id', $orderId)->update(['time_slot' => $request->time_slot]);
 
         return $this->success(null, 'Timeslot updated');
-    }
-
-    // Cart countdown for the app: when the cart is cleared and seconds left.
-    public function cartTimer(Request $request)
-    {
-        $request->validate(['user_id' => 'required|exists:users,id']);
-
-        return $this->success($this->cart->status($request->user_id));
-    }
-
-    // Customer chose to keep their cart: restart the CART_TIME countdown.
-    public function extendCart(Request $request)
-    {
-        $request->validate(['user_id' => 'required|exists:users,id']);
-
-        if (!$this->cart->extend($request->user_id)) {
-            return $this->error('Your cart has expired or is empty', 410);
-        }
-
-        return $this->success($this->cart->status($request->user_id), 'Cart time extended');
     }
 }

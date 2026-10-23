@@ -12,7 +12,6 @@ use App\Models\Pincode;
 use App\Models\TimeSlot;
 use App\Models\User;
 use App\Models\Wallet;
-use App\Services\CartService;
 use App\Services\SmsService;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
@@ -24,12 +23,10 @@ class OrderBookApiController extends Controller
     use ApiResponse;
 
     protected $smsService;
-    protected $cart;
 
-    public function __construct(SmsService $smsService, CartService $cart)
+    public function __construct(SmsService $smsService)
     {
         $this->smsService = $smsService;
-        $this->cart       = $cart;
     }
 
     public function smstest(Request $request)
@@ -198,13 +195,10 @@ class OrderBookApiController extends Controller
             'date'          => $request->date,
         ]);
 
-        // The order now counts as the coupon use, so the cart hold is no longer
-        // needed; and the cart is gone, so stop its timer. An expired cart is
-        // deliberately NOT cleared here — payment may already have been taken.
+        // The order now counts as the coupon use, so the cart hold is no longer needed.
         if ($request->filled('coupon_code')) {
             optional(Coupen::where('coupen_code', $request->coupon_code)->first())->releaseFor((int) $request->user_id);
         }
-        $this->cart->finish($request->user_id);
 
         // Deduct wallet balance
         $walletBalance = Wallet::where('user_id', $request->user_id)
