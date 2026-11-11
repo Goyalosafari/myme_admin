@@ -37,22 +37,22 @@ use Illuminate\Support\Facades\Route;
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
-Route::post('/test-sms', [OrderBookApiController::class, 'smstest']);
-Route::post('/order-sms', [OrderBookApiController::class, 'smsorder']);
-Route::post('/cancel-sms', [OrderBookApiController::class, 'smscancel']);
+Route::post('/test-sms', [OrderBookApiController::class, 'smstest'])->middleware('throttle:otp');
+Route::post('/order-sms', [OrderBookApiController::class, 'smsorder'])->middleware('throttle:otp');
+Route::post('/cancel-sms', [OrderBookApiController::class, 'smscancel'])->middleware('throttle:otp');
 ///Route::post('/send-otp', [OrderBookApiController::class, 'sendOtp']);
 
 Route::post('/deactivate-user', [UserApiController::class, 'deactivateUser']);
 
 
-Route::post('/send-otp', [OtpApiController::class, 'sendOtp']);
+Route::post('/send-otp', [OtpApiController::class, 'sendOtp'])->middleware('throttle:otp');
 Route::post('/verify-otp', [OtpApiController::class, 'verifyOtp']);
 Route::post('/verify-mobile-otp-token', [OtpApiController::class, 'verifyMobileWidgetOtp']);
-Route::post('/send-register-otp', [OtpApiController::class, 'sendRegisterOtp']);
+Route::post('/send-register-otp', [OtpApiController::class, 'sendRegisterOtp'])->middleware('throttle:otp');
 Route::post('/verify-register-otp', [OtpApiController::class, 'verifyRegisterOtp']);
-Route::post('/send-login-otp', [OtpApiController::class, 'sendLoginOtp']);
-Route::post('/forgot-password-otp', [OtpApiController::class, 'forgotPasswordOtp']);
-Route::post('/user/send-email-otp', [OtpApiController::class, 'sendEmailOtp']);
+Route::post('/send-login-otp', [OtpApiController::class, 'sendLoginOtp'])->middleware('throttle:otp');
+Route::post('/forgot-password-otp', [OtpApiController::class, 'forgotPasswordOtp'])->middleware('throttle:otp');
+Route::post('/user/send-email-otp', [OtpApiController::class, 'sendEmailOtp'])->middleware('throttle:otp');
 Route::post('/check-user-by-mobile', [UserApiController::class, 'checkUserByMobile']);
 
 Route::post('/login', [AuthApiController::class, 'login']);
@@ -136,7 +136,6 @@ Route::post('/addToCart', [OrderApiController::class, 'addToCart']);
     
     Route::post('/createOrderBook', [OrderBookApiController::class, 'createOrderBook']);
 
-	Route::post('/test-sms', [OrderBookApiController::class, 'testSmsSending']); //smstest
 
     
     Route::post('/cancelOrder', [OrderBookApiController::class, 'cancelOrder']);

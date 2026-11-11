@@ -43,7 +43,7 @@ jobs:
       - uses: appleboy/ssh-action@v1
         with:
           # AWS EC2 server; override with SSH_HOST / SSH_USER secrets if it changes.
-          host: ${{ secrets.SSH_HOST || '13.201.45.14' }}
+          host: ${{ secrets.SSH_HOST || '3.108.34.67' }}
           username: ${{ secrets.SSH_USER || 'ubuntu' }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}

@@ -11,7 +11,7 @@ class PaymentApiController extends Controller
 
     public function index(Request $request)
     {
-        $api = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
+        $api = new Api(config('services.razorpay.key'), config('services.razorpay.secret'));
     
         $orderData = [
             'receipt'         => 'rcptid_11',
@@ -24,13 +24,13 @@ class PaymentApiController extends Controller
     
         return response()->json([
             'order_id' => $razorpayOrder['id'],
-            'razorpay_key' => env('RAZORPAY_KEY')
+            'razorpay_key' => config('services.razorpay.key')
         ]);
     }
 
     public function storeTest(Request $request)
     {
-        $api = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
+        $api = new Api(config('services.razorpay.key'), config('services.razorpay.secret'));
         $razorpayOrder = $api->order->create([
             'receipt' => $request->invoice,
             'amount' => $request->payment_amount * 100, // Amount in paisa
@@ -43,7 +43,7 @@ class PaymentApiController extends Controller
     {
         $input = $request->all();
   
-        $api = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
+        $api = new Api(config('services.razorpay.key'), config('services.razorpay.secret'));
   
         $payment = $api->payment->fetch($input['razorpay_payment_id']);
   

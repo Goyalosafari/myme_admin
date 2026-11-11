@@ -102,7 +102,7 @@ return [
     'passwords' => [
         'users' => [
             'provider' => 'users',
-            'table' => 'password_resets',
+            'table' => 'password_reset_tokens', // matches the 2014_10_12_100000 migration
             'expire' => 60,
             'throttle' => 60,
         ],

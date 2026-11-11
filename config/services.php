@@ -36,4 +36,10 @@ return [
         'template_id' => env('MSG91_TEMPLATE_ID'),
     ],
 
+    // Read through config() — env() returns null once `config:cache` has run (it does on deploy).
+    'razorpay' => [
+        'key'    => env('RAZORPAY_KEY'),
+        'secret' => env('RAZORPAY_SECRET'),
+    ],
+
 ];

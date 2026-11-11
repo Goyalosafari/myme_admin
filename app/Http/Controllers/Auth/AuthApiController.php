@@ -65,4 +65,18 @@ class AuthApiController extends Controller
             ? response(['message'=> __($status)], 200)
             : response(['message' => __($status)], 400);
     }
+
+    // POST /api/logout — the route pointed here but the method was missing (500).
+    // Revokes the bearer token if one was sent; succeeds either way so the app
+    // can always finish logging out locally.
+    public function destroy(Request $request)
+    {
+        $user = Auth::guard('sanctum')->user();
+
+        if ($user && $user->currentAccessToken()) {
+            $user->currentAccessToken()->delete();
+        }
+
+        return response(['message' => 'Logged out successfully'], 200);
+    }
 }
