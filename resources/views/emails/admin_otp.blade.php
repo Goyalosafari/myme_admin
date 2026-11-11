@@ -13,7 +13,7 @@
 <body>
     <div class="card">
         <p>Hello Admin,</p>
-        <p>Use the OTP below to complete your login. It expires in <strong>5 minutes</strong>.</p>
+        <p>Use the OTP below to complete your login. It expires in <strong>30 minutes</strong>.</p>
         <div class="otp">{{ $otp }}</div>
         <p>If you did not request this, please ignore this email.</p>
         <small>{{ config('app.name') }} — Admin Panel</small>

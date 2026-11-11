@@ -68,7 +68,7 @@
                                 <button type="submit" class="btn btn-link btn-sm p-0 align-baseline">Resend OTP</button>
                             </form>
 
-                            <p class="text-center text-muted mt-2 small">OTP expires in 5 minutes.</p>
+                            <p class="text-center text-muted mt-2 small">OTP expires in 30 minutes.</p>
                         </div>
                     </div>
                 </div>

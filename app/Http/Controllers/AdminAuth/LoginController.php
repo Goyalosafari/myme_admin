@@ -73,7 +73,7 @@ class LoginController extends Controller
         session([
             'admin_otp'            => $otp,
             'admin_otp_email'      => $email,
-            'admin_otp_expires_at' => now()->addMinutes(5)->timestamp,
+            'admin_otp_expires_at' => now()->addMinutes(30)->timestamp,
         ]);
 
         try {
