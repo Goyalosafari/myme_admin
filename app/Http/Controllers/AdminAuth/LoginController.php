@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\AdminOtpMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class LoginController extends Controller
@@ -50,7 +51,10 @@ class LoginController extends Controller
             Mail::to($request->email)->send(new AdminOtpMail($otp));
             return redirect()->route('admin.otp');
         } catch (\Exception $e) {
-            if (config('app.debug')) {
+            Log::error('Admin OTP email failed', ['to' => $request->email, 'error' => $e->getMessage()]);
+
+            // Locally the OTP page shows the code, so carry on without email.
+            if (app()->environment('local')) {
                 return redirect()->route('admin.otp');
             }
             session()->forget(['admin_otp', 'admin_otp_email', 'admin_otp_expires_at']);

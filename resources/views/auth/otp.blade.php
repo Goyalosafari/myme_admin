@@ -23,7 +23,8 @@
                                 <p>A 6-digit OTP has been sent to your admin email.</p>
                             </div>
 
-                            @if(config('app.debug') && session('admin_otp'))
+                            {{-- Only on a local machine; never show the OTP on the live site. --}}
+                            @if(app()->environment('local') && session('admin_otp'))
                                 <div class="alert alert-warning text-center" role="alert">
                                     <strong>Dev Mode &mdash; SMTP not configured</strong><br>
                                     Your OTP is:
