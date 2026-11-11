@@ -39,28 +39,51 @@ class LoginController extends Controller
                 ->withErrors(['credentials' => 'Invalid email or password. Please try again.']);
         }
 
+        if ($this->issueOtp($request->email)) {
+            return redirect()->route('admin.otp');
+        }
+
+        session()->forget(['admin_otp', 'admin_otp_email', 'admin_otp_expires_at']);
+        return back()
+            ->withInput(['email' => $request->email])
+            ->with('mail_error', 'OTP email could not be sent. Please fix the mail configuration.');
+    }
+
+    // Sends a fresh code to the email that already passed the password check.
+    public function resendOtp()
+    {
+        $email = session('admin_otp_email');
+
+        if (!$email) {
+            return redirect()->route('admin.login')->withErrors(['email' => 'Session expired. Please log in again.']);
+        }
+
+        if ($this->issueOtp($email)) {
+            return redirect()->route('admin.otp')->with('status', 'A new OTP has been sent to your email.');
+        }
+
+        return redirect()->route('admin.otp')->withErrors(['otp' => 'OTP email could not be sent. Please try again shortly.']);
+    }
+
+    // Creates a new OTP (replacing any old one) and emails it. Returns false if the email failed.
+    private function issueOtp(string $email): bool
+    {
         $otp = random_int(100000, 999999);
 
         session([
             'admin_otp'            => $otp,
-            'admin_otp_email'      => $request->email,
+            'admin_otp_email'      => $email,
             'admin_otp_expires_at' => now()->addMinutes(5)->timestamp,
         ]);
 
         try {
-            Mail::to($request->email)->send(new AdminOtpMail($otp));
-            return redirect()->route('admin.otp');
+            Mail::to($email)->send(new AdminOtpMail($otp));
+            return true;
         } catch (\Exception $e) {
-            Log::error('Admin OTP email failed', ['to' => $request->email, 'error' => $e->getMessage()]);
+            Log::error('Admin OTP email failed', ['to' => $email, 'error' => $e->getMessage()]);
 
             // Locally the OTP page shows the code, so carry on without email.
-            if (app()->environment('local')) {
-                return redirect()->route('admin.otp');
-            }
-            session()->forget(['admin_otp', 'admin_otp_email', 'admin_otp_expires_at']);
-            return back()
-                ->withInput(['email' => $request->email])
-                ->with('mail_error', 'OTP email could not be sent. Please fix the mail configuration.');
+            return app()->environment('local');
         }
     }
 

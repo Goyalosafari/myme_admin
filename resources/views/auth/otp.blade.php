@@ -62,7 +62,13 @@
                                 </div>
                             </form>
 
-                            <p class="text-center text-muted mt-4 small">OTP expires in 5 minutes.</p>
+                            <form action="{{ route('admin.otp.resend') }}" method="POST" class="text-center mt-4">
+                                @csrf
+                                <span class="text-muted small">Didn't get the email? Check Spam, or</span>
+                                <button type="submit" class="btn btn-link btn-sm p-0 align-baseline">Resend OTP</button>
+                            </form>
+
+                            <p class="text-center text-muted mt-2 small">OTP expires in 5 minutes.</p>
                         </div>
                     </div>
                 </div>

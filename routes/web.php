@@ -46,6 +46,7 @@ Route::get('admin/login',[LoginController::class, 'showLoginForm'])->name('admin
 Route::post('admin/login',[LoginController::class, 'sendOtp'])->name('login');
 Route::get('admin/otp',[LoginController::class, 'showOtpForm'])->name('admin.otp');
 Route::post('admin/otp',[LoginController::class, 'verifyOtp'])->name('admin.otp.verify');
+Route::post('admin/otp/resend',[LoginController::class, 'resendOtp'])->name('admin.otp.resend')->middleware('throttle:3,1');
 
 Route::middleware(['admin.auth', 'web', 'prevent-back-history'])->group(function(){
 
